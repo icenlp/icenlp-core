@@ -3,7 +3,7 @@
 
     <groupId>icenlp</groupId>
     <artifactId>icenlp-core</artifactId>
-    <version>11.3</version>
+    <version>11.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>icenlp-core</name>

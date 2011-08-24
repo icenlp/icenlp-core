@@ -70,6 +70,12 @@
         </dependency>
 
     </dependencies>
+    
+    <scm>
+		<connection>scm:git:git@github.com:icenlp/icenlp-core.git</connection>
+		<url>scm:git:git@github.com:icenlp/icenlp-core.git</url>
+		<developerConnection>scm:git:git@github.com:icenlp/icenlp-core.git</developerConnection>
+	</scm>
 
     <build>
         <plugins>
@@ -171,4 +177,15 @@
 
         </plugins>
     </build>
+    
+      <distributionManagement>
+		<repository>
+			<id>repo</id>
+			<url>https://github.com/icenlp/mvn-repo/raw/master/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshot-repo</id>
+			<url>https://github.com/icenlp/mvn-repo/raw/master/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

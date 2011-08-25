@@ -29,7 +29,8 @@ import java.io.*;
 %public
 %class Preprocess
 %standalone
-%line
+%line    
+%extends IceParserTransducer
 
 %unicode
 
@@ -56,7 +57,17 @@ import java.io.*;
 		if (Character.isLetter(chr))	// Then this letter is a part of a real tag and we may need a space after it 
 			changedStr =  txt + " ";
 	}
-	return changedStr;			
+
+// new, phrase_mwe problem.
+/*
+	Character chr2 = txt.charAt(0);
+	if(Character.isLetter(chr2))
+	{	
+		changedStr = " "+changedStr;
+	}
+*/
+///
+	return changedStr;		
   }
 %}
   

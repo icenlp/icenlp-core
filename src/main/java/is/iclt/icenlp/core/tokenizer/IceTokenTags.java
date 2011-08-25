@@ -45,8 +45,10 @@ public class IceTokenTags extends TokenTags
     private UnknownType unknownType;    // type of unknown
     private boolean compound;   // Assigned by compound analysis?
     private SVOMark svoMark;        // Subject, verb, object mark
-
-
+    
+    private boolean unknownExternal = false;	// Was the word marked unknown by an external source
+    private String invMWMark = null;
+    
     public IceTokenTags()
     {
         super();
@@ -174,6 +176,26 @@ public class IceTokenTags extends TokenTags
     public boolean isCompound()
     {
         return (compound);
+    }
+    
+    public boolean isUnknownExternal()
+    {
+    	return (unknownExternal);
+    }
+    
+    public void setUnknownExternal(boolean unknown)
+    {
+    	unknownExternal = unknown;
+    }
+    
+    public void setInvMWMark(String invMWMark)
+    {
+    	this.invMWMark = invMWMark;
+    }
+    
+    public String getInvMWMark()
+    {
+    	return invMWMark;
     }
 
     public void setUnknownType(UnknownType type)
@@ -1134,6 +1156,20 @@ public boolean personNumberMatch(IceTokenTags tok)
     {
         cleanVerbTags();
         changeReflexivePronounTags();
+    }
+
+    public void cleanProperNounTags()
+    // Removes named entity distinction from proper nouns
+    {
+        ArrayList tags = getTags();
+		for( int j = 0; j < tags.size(); j++ )
+		{
+            IceTag tag = (IceTag)tags.get( j );
+            if (tag.isProperNoun())
+            {
+            	tag.setOtherName();
+            }
+        }
     }
 
     private void cleanVerbTags()

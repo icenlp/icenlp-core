@@ -21,6 +21,10 @@
  */
 package is.iclt.icenlp.facade;
 
+import is.iclt.icenlp.core.apertium.ApertiumEntry;
+import is.iclt.icenlp.core.apertium.ApertiumSegmentizer;
+import is.iclt.icenlp.core.apertium.IceNLPTokenConverter;
+import is.iclt.icenlp.core.apertium.LtProcParser;
 import is.iclt.icenlp.core.icemorphy.IceMorphy;
 import is.iclt.icenlp.core.icetagger.IceTagger;
 import is.iclt.icenlp.core.icetagger.IceTaggerLexicons;
@@ -32,6 +36,7 @@ import is.iclt.icenlp.core.tritagger.TriTagger;
 import is.iclt.icenlp.core.tritagger.TriTaggerResources;
 import is.iclt.icenlp.core.utils.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -55,6 +60,7 @@ public class IceTaggerFacade
     private IceTagger tagger;
     private Segmentizer segmentizer;
     private Lexicon mapper;
+    private IceTaggerLexicons iceLexicons;
 
     public IceTaggerFacade(IceTaggerLexicons iceLexicons, Lexicon tokenizerLexicon) throws IOException
     {
@@ -65,6 +71,7 @@ public class IceTaggerFacade
         //this.tokenizer.findMultiWords( false );
 
         initIceTagger(iceLexicons);
+        this.iceLexicons = iceLexicons;
     }
     
     public IceTaggerFacade(IceTaggerLexicons iceLexicons, Lexicon tokenizerLexicon, String morphyLexiconsDictFileWithLocation) throws IOException
@@ -107,6 +114,12 @@ public class IceTaggerFacade
         this.mapper = mapperLexicon;
         if(preLoadlemmald)
             Lemmald.getInstance();
+    }
+    
+    
+    public void setNamedEntityRecognition(boolean flag)
+    {
+    	this.tagger.setNamedEntityRecognition(flag);
     }
 
    public void dateHandling( boolean doSpecialDateHandling )
@@ -219,5 +232,43 @@ public class IceTaggerFacade
         }
 
         return sents;
+    }
+    
+    public Pair<IceTokenSentences, ArrayList<ApertiumEntry>> tagExternal(String text, MappingLexicon mappingLexicon) throws IOException
+    {
+    	IceTokenSentence sent = null;
+    	IceTokenSentences sents = new IceTokenSentences();
+    	
+    	ApertiumSegmentizer segmentizer = new ApertiumSegmentizer(new ByteArrayInputStream(text.getBytes()));
+		
+		LtProcParser lps;
+		ArrayList<ApertiumEntry> entries = null;
+		
+		IceNLPTokenConverter converter;
+		ArrayList<IceTokenTags> tokens;
+		
+		while(segmentizer.hasMoreSentences())
+		{
+			// Send the lt-proc string into the parser
+			lps = new LtProcParser(segmentizer.getSentance());
+			entries = lps.parse();
+
+			// Create the appertium -> iceNLP converter
+			converter = new IceNLPTokenConverter(entries, mappingLexicon, iceLexicons);
+			tokens = converter.convert();
+
+			// Do the actual tagging
+			tagger.tagExternalTokens(tokens);
+			
+			// Convert back reflexive changes that IceTagger did
+			converter.changeReflexivePronounTags(tokens);
+			
+			sent = new IceTokenSentence(tokens);
+            sents.add(sent);
+			
+			segmentizer.processNextSentence();
+		}
+		
+		return new Pair<IceTokenSentences, ArrayList<ApertiumEntry>>(sents, entries);
     }
 }

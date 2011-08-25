@@ -37,7 +37,7 @@ import java.io.*;
 %class Phrase_PP
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -69,12 +69,14 @@ import java.io.*;
 
 Vegna = {WhiteSpace}*vegna{WhiteSpace}+
 
-NounPhrase = {OpenNP}~{CloseNP}
+NounPhrase = {OpenNP}" "~{CloseNP} | {OpenNP}n~{CloseNP} | {OpenNP}a~{CloseNP} | {OpenNP}d~{CloseNP} | {OpenNP}g~{CloseNP} //avoid "NP?"
 NPs = {OpenNPs}~{CloseNPs}
 AdverbPrepPhrase = {MWE_PP}
 
-NPGenSpec = {OpenNP}g~f(p|s)hee{WhiteSpace}+{CloseNP}
-AdjectivePhrase = {OpenAP}~{CloseAP}
+NPGenSpec = {OpenNP}g~{encodeOpen}f(p|s)hee{encodeClose}{WhiteSpace}+{CloseNP}
+
+AdjectivePhrase = {OpenAP} ~{CloseAP}
+AdjectivePhrases = {OpenAPs}~{CloseAPs}
  
 AdverbPhrase = {OpenAdvP}~{CloseAdvP} | {MWE_AdvP}
 VerbPhraseInf = {OpenVPi}~{CloseVPi}
@@ -82,14 +84,16 @@ VerbPhraseInf = {OpenVPi}~{CloseVPi}
 NumSeq = {NPNum}({WhiteSpace}*{ConjPhraseOrComma}{WhiteSpace}+{NPNum})*
 GenQualifier = {WhiteSpace}*({NPGen} | {NPsGen})
 
-OneNP = ({NounPhrase}|{AdjectivePhrase}){GenQualifier}?
+OneNP = ({NounPhrase}|{AdjectivePhrase}|{AdjectivePhrases}){GenQualifier}?
 SeqNP = {NPs}{GenQualifier}?
 //Sem = {ConjPhraseSem}{WhiteSpace}+{OneNP}
 
 // MWE_AdvP can appear like in [PP á aþ [MWE_AdvP um ao það faheo bil nheo MWE_AdvP] [NP tíu tfvfþ sekúndum nvfþ NP] PP]
+
 PrepPhraseRest1 = {AdverbPhrase}{WhiteSpace}+({OneNP}|{SeqNP}) | {OneNP} | {SeqNP} | {NumSeq} 
 PrepPhraseRest2 = {VerbPhraseInf}
 PrepPhraseRest3 = {GenQualifier}{WhiteSpace}+({OneNP}|{SeqNP})
+
 
 PrepPhraseAccDat = {PrepositionAccDat}({PrepPhraseRest1}|{PrepPhraseRest2}|{PrepPhraseRest3})? 
 PrepPhraseGen = {PrepositionGen}({PrepPhraseRest1}|{PrepPhraseRest2})?

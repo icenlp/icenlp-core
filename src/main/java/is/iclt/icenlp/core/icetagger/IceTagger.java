@@ -36,7 +36,6 @@ import java.util.ArrayList;
  * <li>Hrafn Loftsson. 2006. Tagging a morphologically complex language using heuristics. In T. Salakoski, F. Ginter, S. Pyysalo and T. Pahikkala (eds.), Advances in Natural Language Processing, 5th International Conference on NLP, FinTAL 2006, Proceedings. Turku, Finland.</li>
  * @author Hrafn Loftsson
  */
-
 public class IceTagger
 {
     public enum HmmModelType {start, end, startend, none} // start and/or end with a HMM model or no model at all
@@ -61,6 +60,10 @@ public class IceTagger
 	public static final int sentenceStartLowerCase = 1;
 	private int sentenceStart;
     private HmmModelType modelType = HmmModelType.none; // no HMM model as a default
+    // HL: Added 26.11.2010  - If true, then numbers are always tagged with "ta"
+    private boolean sameTagForAllNumbers = true;
+    // HL: Added 26.11.2010 -  If true then don't ignore the last letter of Proper nouns
+    private boolean namedEntityRecognition = false;
 
     public IceTagger( int sentenceStart, IceLog log, IceMorphy morphoAnalyzer, Lexicon baseDict,
                       Lexicon mainDict,
@@ -98,6 +101,16 @@ public class IceTagger
     public void setTriTagger(TriTagger tagger)
     {
         triTagger = tagger;
+    }
+
+    public void setSameTagForAllNumbers(boolean flag)
+    {
+        sameTagForAllNumbers = flag;
+    }
+
+    public void setNamedEntityRecognition(boolean flag)
+    {
+        namedEntityRecognition = flag;
     }
 
     public void setHmmModelType(HmmModelType theModelType)
@@ -145,6 +158,37 @@ public class IceTagger
 				numAmbiguousTokens++;    // Increase the number of ambiguous words
 				totalTagsAmbiguous += numTags;
 			}
+    }
+
+    private void assignTagToNumber(IceTokenTags currToken)
+    {
+		dictionaryTokenLookup( currToken, false );    // Don't ignore case
+		// Override the lexicon!
+        if (sameTagForAllNumbers)
+           currToken.setTag( IceTag.tagOrdinal );
+        else {
+		    if( currToken.lexeme.matches( "[0-9\\-\\/\\.,]+%" ) )
+		        currToken.setTag( IceTag.tagPercentage );
+		    else
+			    currToken.setTag( IceTag.tagOrdinal );
+        }
+		currToken.setUnknownType( IceTokenTags.UnknownType.guessed );
+        //System.out.println(currToken.lexeme + ": " + currToken.allTagStrings());
+    }
+
+    private void assignTagToAbbreviation(IceTokenTags currToken)
+    {
+    	if( Character.isLowerCase( currToken.lexeme.charAt( 0 ) ) )
+			dictionaryTokenLookup( currToken, true );     // Lookup ignore case
+		else
+		{ // Probably a proper noun abbreviation
+			dictionaryTokenLookup( currToken, false );    // Lookup don't ignore case
+			if( currToken.noTags() )                     // If still no tags
+			{
+				currToken.setTag( IceTag.tagProperNoun );  // Default proper noun
+				currToken.setUnknownType( IceTokenTags.UnknownType.guessed );
+			}
+		}
     }
 
     /**
@@ -242,31 +286,10 @@ public class IceTagger
 				currToken.setTag( currToken.lexeme );
 			// A Cardinal: A token with tokenCode=tcNumber
 			else if( currToken.tokenCode == Token.TokenCode.tcNumber )
-			{
-				dictionaryTokenLookup( currToken, false );    // Don't ignore case
-				// Override the lexicon!
-				if( currToken.lexeme.matches( "[0-9\\-\\/\\.,]+%" ) )
-					currToken.setTag( IceTag.tagPercentage );
-				else
-					currToken.setTag( IceTag.tagOrdinal );
-				currToken.setUnknownType( IceTokenTags.UnknownType.guessed );
-				//}
-			}
+                assignTagToNumber(currToken);
 			// An abbreviation
 			else if( currToken.tokenCode == Token.TokenCode.tcAbbrev )
-			{
-				if( Character.isLowerCase( currToken.lexeme.charAt( 0 ) ) )
-					dictionaryTokenLookup( currToken, true );     // Lookup ignore case
-				else
-				{ // Probably a proper noun abbreviation
-					dictionaryTokenLookup( currToken, false );    // Lookup don't ignore case
-					if( currToken.noTags() )                     // If still no tags
-					{
-						currToken.setTag( IceTag.tagProperNoun );  // Default proper noun
-						currToken.setUnknownType( IceTokenTags.UnknownType.guessed );
-					}
-				}
-			}
+                assignTagToAbbreviation(currToken);
 			else if
 				// ProperNoun: A token with a capital first letter and not appearing at the beginning of a sentence
 				// and not already marked as an abbreviation
@@ -297,15 +320,12 @@ public class IceTagger
 				{
 					dictionaryTokenLookup( currToken, true ); // First ignore case
 					if( currToken.noTags() ) // The word then could be a proper noun
-					{
 						dictionaryTokenLookup( currToken, false ); // Now don't ignore case
-					}
 				}
-
 				else // i > 0 || sentenceStart == sentenceStartLowerCase
 				{
 					// Use this if every sentence starts with a lower case except proper nouns
-					dictionaryTokenLookup( currToken, false );   // Ignore case
+					dictionaryTokenLookup( currToken, false );   // Don't ignore case
 					if( i == 0 && currToken.noTags() && Character.isUpperCase( currToken.lexeme.charAt( 0 ) ) )
 						currToken.setUnknownType( IceTokenTags.UnknownType.properNoun );
 				}
@@ -363,6 +383,8 @@ public class IceTagger
 		{
 			currToken = (IceTokenTags)tokens.get( i );
             currToken.cleanTags();
+            if (!namedEntityRecognition)
+                currToken.cleanProperNounTags();
         }
         removeSubjectObjectMarkings();
 	}
@@ -502,7 +524,8 @@ public class IceTagger
 	private void disambiguate()
 	{
 		ambiguator.setTokens( myTokens );
-		processNumericConstants();
+        if (!sameTagForAllNumbers)
+		    processNumericConstants();
 		phrases.findIdioms( myTokens );
 		phrasalVerbs();
 
@@ -514,6 +537,7 @@ public class IceTagger
             for (int i=0; i<=myTokens.size()-1; i++)
             {
                 IceTokenTags tok = (IceTokenTags)myTokens.get(i);
+                
                 tok.removeAllButFirstTag();
             }
         }
@@ -602,7 +626,6 @@ public class IceTagger
         }
     }
 
-
     /**
      * Tags the supplied tokens.
      * @param tokens  The tokens
@@ -618,13 +641,14 @@ public class IceTagger
 			morpho.setTokens( myTokens );
 			morpho.morphoAnalysis();
 			checkAssignment();
-            if( startWithHmmModel && triTagger != null ) {
-                tagWithTriTagger();
+            if( startWithHmmModel && triTagger != null ) 
+            {
+            	tagWithTriTagger();
             }
+            
             disambiguate();
 		}
 		cleanTags();
-
 
         if( endWithHmmModel && triTagger != null )
         {
@@ -632,5 +656,41 @@ public class IceTagger
 			triTagger.tagTokens( myTokens, false );
 		}
 	}
+    
+    /**
+     * Tags the tokens supplied by an external morpho analyzer
+     * @param tokens
+     */
+    public void tagExternalTokens(ArrayList<IceTokenTags> tokens)
+	{
+        myTokens = tokens;
+        
+        if( startWithHmmModel && triTagger != null ) 
+        {
+            tagWithTriTagger();
+        }
+        
+        // Test for unknown words
+        for(IceTokenTags itt: tokens)
+        {
+        	if(itt.isUnknown())
+        	{
+        		dictionaryTokenLookup(itt, false);
+        	}
+        }
+        
+        // This morpho analysis will only run on words with no tags
+        morpho.setTokens(myTokens);
+		morpho.morphoAnalysis();
+        
+		// Do the tagging
+        disambiguate();
+		cleanTags();
 
+        if( endWithHmmModel && triTagger != null )
+        {
+			enforceOneTagSVOVerb();        // We will assume that the first SVO verb is the correct one!
+			triTagger.tagTokens( myTokens, false );
+		}
+	}
 }

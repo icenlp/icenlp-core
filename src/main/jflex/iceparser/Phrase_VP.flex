@@ -31,7 +31,7 @@ import java.io.*;
 %class Phrase_VP
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -91,9 +91,9 @@ import java.io.*;
 %include src/main/jflex/iceparser/regularDef.txt
 %include src/main/jflex/iceparser/verbLexicon.txt
 
-VerbPastPartTag = sþ{Voice}{Gender}{Number}{Case}
-VerbPresentPartTag = slg
-VerbSupineTag = ss{Voice}
+VerbPastPartTag = {encodeOpen}sþ{Voice}{Gender}{Number}{Case}{encodeClose}
+VerbPresentPartTag = {encodeOpen}slg{encodeClose}
+VerbSupineTag = {encodeOpen}ss{Voice}{encodeClose}
 
 AdverbPhrase = {OpenAdvP}~{CloseAdvP}
 VerbBeAndTag =	{WhiteSpace}*{VerbBe}{WhiteSpace}+{VerbFiniteTag}

@@ -29,7 +29,7 @@ import java.io.*;
 %class Func_SUBJ2
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -66,8 +66,6 @@ import java.io.*;
 %include src/main/jflex/iceparser/funcDef.txt
 %include src/main/jflex/iceparser/verbLexicon.txt
 
-//VPBe = {OpenVPb}~{CloseVPb}
-//Function = {FuncQualifier} | {FuncSubject} | {FuncObject} | {FuncObjectI} | {FuncComplement}
 Subject = {NomSubject}({WhiteSpace}+{FuncQualifier})?
 
 PP = {OpenPP}~{ClosePP}

@@ -30,6 +30,7 @@ import is.iclt.icenlp.core.tritagger.TriTaggerLexicons;
 import is.iclt.icenlp.core.tokenizer.Sentences;
 import is.iclt.icenlp.core.utils.Lexicon;
 import is.iclt.icenlp.core.utils.FileEncoding;
+import is.iclt.icenlp.core.iceparser.OutputFormatter;
 
 import javax.swing.*;
 import java.io.*;
@@ -50,6 +51,7 @@ public class TagAndParse implements ActionListener {
     private JTextArea textTagged;
     private JTextArea textParsed;
     private JCheckBox checkIncludeFunc, checkPhrasePerLine, checkTokenPerLine;
+    private JCheckBox checkPotentialErrors, checkFeatureAgreement, checkMergeLabels;
     // checkTriTagger=true if use TriTagger with IceTagger
     // checkOnlYTriTagger=true if only use TriTagger for tagging (not IceTagger)
     private JCheckBox checkTriTagger, checkOnlyTriTagger;
@@ -57,6 +59,8 @@ public class TagAndParse implements ActionListener {
     private TriTaggerFacade tritagger;
     private IceParserFacade parser;
     private String modelPath="../../ngrams/models/";
+    OutputFormatter outFormatter;
+    OutputFormatter.OutputType outputType = OutputFormatter.OutputType.plain;
 
 
    public TagAndParse() throws IOException
@@ -67,6 +71,7 @@ public class TagAndParse implements ActionListener {
         tagger = new IceTaggerFacade(IceTagger.HmmModelType.startend);
         tritagger = new TriTaggerFacade();
         parser = new IceParserFacade();
+        outFormatter = new OutputFormatter();
 
    }
 
@@ -95,7 +100,7 @@ public class TagAndParse implements ActionListener {
             JFrame.setDefaultLookAndFeelDecorated(true);
 
             //Create and set up the window.
-            frame = new JFrame("Greining texta - mörkun (IceTagger/TriTagger) og þáttun (IceParser)");
+            frame = new JFrame("Tagging (IceTagger/TriTagger) and parsing (IceParser) of Icelandic text");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setBounds(30,30,200,300);
 
@@ -127,9 +132,10 @@ public class TagAndParse implements ActionListener {
        return buf.toString();
     }
 
+
     public void actionPerformed(ActionEvent e) {
        String taggedStr=null;
-       if (e.getActionCommand().equals("Greina"))
+       if (e.getActionCommand().equals("Analyse"))
        {
            try {
                 Sentences sents = tagText(textInput.getText());
@@ -143,33 +149,39 @@ public class TagAndParse implements ActionListener {
                 else
                     textTagged.setText(taggedStr);
                 textTagged.setCaretPosition(0);
+
+
                 try {
-                    String parsedStr = parser.parse(taggedStr, checkIncludeFunc.isSelected(), checkPhrasePerLine.isSelected());
+                     if (checkPhrasePerLine.isSelected())
+                        outputType = OutputFormatter.OutputType.phrase_per_line;
+                     else
+                        outputType = OutputFormatter.OutputType.plain;
+                     String parsedStr = parser.parse(taggedStr, outputType, checkIncludeFunc.isSelected(), checkFeatureAgreement.isSelected(), checkPotentialErrors.isSelected(), checkMergeLabels.isSelected());
+
                     textParsed.setText(parsedStr);
                     textParsed.setCaretPosition(0);
                 }
                 catch (IOException ex) {System.err.println("IOException: " + ex.getMessage()); }
            }
        }
-       else if (e.getActionCommand().equals("Hætta"))
-        System.exit(0);
+       
+       else if (e.getActionCommand().equals("Stop"))
+         System.exit(0);
    }
 
     public void createComponents(Container pane) {
-                JButton tagButton = new JButton("Greina texta");
+                JButton tagButton = new JButton("Analyse text");
                 tagButton.setMnemonic(KeyEvent.VK_I);
                 tagButton.addActionListener(this);
                 tagButton.setPreferredSize(new Dimension(20,20));
-                tagButton.setActionCommand("Greina");
+                tagButton.setActionCommand("Analyse");
 
                 int rows=10;
                 int cols=100;
 
                 Dimension textDimension = new Dimension(300,300);
                 Font myFont = new Font("Courier", Font.PLAIN, 16);
-                textInput = new JTextArea(
-                            "Hér skal slá inn textann sem á að greina.",rows,cols
-                    );
+                textInput = new JTextArea("",rows,cols);
                 textInput.setLineWrap(true);
                 textInput.setWrapStyleWord(true);
                 textInput.setFont(myFont);
@@ -178,7 +190,7 @@ public class TagAndParse implements ActionListener {
                 JScrollPane scrollingArea = new JScrollPane(textInput);
                 //scrollingArea.setBorder(BorderFactory.createEmptyBorder(30,30,100,100));
 
-                textTagged = new JTextArea("Hér birtist markaði textinn.",rows,cols);
+                textTagged = new JTextArea("",rows,cols);
                 textTagged.setLineWrap(true);
                 textTagged.setWrapStyleWord(true);
                 textTagged.setFont(myFont);
@@ -186,7 +198,7 @@ public class TagAndParse implements ActionListener {
                 JScrollPane scrollingArea2 = new JScrollPane(textTagged);
                 //textTagged.setPreferredSize(textDimension);
 
-                textParsed = new JTextArea("Hér birtist þáttaði textinn.",rows,cols);
+                textParsed = new JTextArea("",rows,cols);
                 textParsed.setLineWrap(true);
                 textParsed.setWrapStyleWord(true);
                 textParsed.setFont(myFont);
@@ -194,32 +206,54 @@ public class TagAndParse implements ActionListener {
                 JScrollPane scrollingArea3 = new JScrollPane(textParsed);
                 //textParsed.setPreferredSize(textDimension);
 
-                checkTriTagger = new JCheckBox("Nota HMM markara með IceTagger");
+                checkTriTagger = new JCheckBox("Use an HMM tagger with IceTagger");
                 checkTriTagger.setSelected(true); // turn  the check box on or off
-                checkOnlyTriTagger = new JCheckBox("Nota eingöngu HMM markara");
+                checkOnlyTriTagger = new JCheckBox("Only use an HMM tagger");
                 checkOnlyTriTagger.setSelected(false); // turn  the check box on or off
-                checkIncludeFunc = new JCheckBox("Setningafræðileg hlutverk");
+                checkIncludeFunc = new JCheckBox("Syntactic functions");
                 checkIncludeFunc.setSelected(true); // turn  the check box on or off
-                checkPhrasePerLine = new JCheckBox("Liðir í sér línu");
+                checkPhrasePerLine = new JCheckBox("Phrases per line");
                 checkPhrasePerLine.setSelected(true); // turn  the check box on or off
-                checkTokenPerLine = new JCheckBox("Orð/mark í sér línu");
+                checkTokenPerLine = new JCheckBox("Word/tag per line");
                 checkTokenPerLine.setSelected(false); // turn  the check box on or off
+                checkPotentialErrors = new JCheckBox("Mark grammatical errors");
+                checkPotentialErrors.setSelected(false); // turn  the check box on or off
+                checkPotentialErrors.addActionListener(new CheckBoxAction());
+                checkPotentialErrors.setActionCommand("Errors");
+                checkFeatureAgreement = new JCheckBox("Rely on feature agreement");
+                checkFeatureAgreement.setSelected(false); // turn  the check box on or off
+                checkMergeLabels = new JCheckBox("Merge function and phrase labels");
+                checkMergeLabels.setSelected(false); // turn  the check box on or off
 
-                JLabel labTagging = new JLabel("Mörkun:");
-                JLabel labParsing = new JLabel("Þáttun:");
+
+                JLabel labAnalyse = new JLabel("Text to analyse:");
+                JLabel labTagging = new JLabel("Tagged text:");
+                JLabel labParsing = new JLabel("Parsed text:");
+                //JLabel labDummy = new JLabel("");
+
 
                 pane.setLayout(new BoxLayout(frame.getContentPane(),BoxLayout.Y_AXIS));
 
                 JPanel checkBoxPanel = new JPanel(new FlowLayout());
                 checkBoxPanel.add(checkTriTagger);
                 checkBoxPanel.add(checkOnlyTriTagger);
+                checkBoxPanel.add(checkTokenPerLine);
+
                 JPanel checkBoxPanel2 = new JPanel(new FlowLayout());
-                checkBoxPanel2.add(checkTokenPerLine);
                 checkBoxPanel2.add(checkIncludeFunc);
                 checkBoxPanel2.add(checkPhrasePerLine);
+
+                JPanel checkBoxPanel3 = new JPanel(new FlowLayout());
+                checkBoxPanel3.add(checkFeatureAgreement);
+                checkBoxPanel3.add(checkPotentialErrors);
+                checkBoxPanel3.add(checkMergeLabels);
+
                 pane.add(checkBoxPanel, BorderLayout.CENTER);
                 pane.add(checkBoxPanel2, BorderLayout.CENTER);
+                pane.add(checkBoxPanel3, BorderLayout.CENTER);
                 pane.add(tagButton, BorderLayout.CENTER);
+                //pane.add(labDummy, BorderLayout.CENTER);
+                pane.add(labAnalyse, BorderLayout.CENTER);
                 pane.add(scrollingArea,BorderLayout.CENTER);
                 pane.add(labTagging, BorderLayout.WEST);
                 pane.add(scrollingArea2,BorderLayout.CENTER);
@@ -256,8 +290,8 @@ public class TagAndParse implements ActionListener {
    public static void main(String[] args)
    throws IOException {
 
-       TagAndParse app = new TagAndParse();
-       //TagAndParse app = new TagAndParse(true);
+       //TagAndParse app = new TagAndParse();
+       TagAndParse app = new TagAndParse(true);
 
        if (args.length == 1) {
           app.createAndShowGUI(args[0]);
@@ -267,4 +301,11 @@ public class TagAndParse implements ActionListener {
         }
 
    }
+
+   public class CheckBoxAction implements ActionListener{
+    public void actionPerformed(ActionEvent e){
+      if (checkPotentialErrors.isSelected())
+        checkFeatureAgreement.setSelected(true);
+    }
+  }
 }

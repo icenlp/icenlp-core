@@ -341,7 +341,7 @@ RULE currToken.lexeme.equals("á") &&
 	(prevToken != null && prevToken.isInterrogativePronoun() && 
 	(prevToken.lexeme.equalsIgnoreCase("hver") || prevToken.lexeme.equalsIgnoreCase("hvað"))) ||
 // Ég á
-	(prevprevToken == null && prevToken != null && prevToken.isPersonalPronoun()) ||
+	(prevprevToken == null && prevToken != null && prevToken.isPersonalPronoun() && currToken.isVerb()) ||
 // Ég/Maður á (ekki) að
 	(prevToken != null && (prevToken.isOnlyWordClass(PERSPRONOUN) || prevToken.isOnlyWordClass(NOUN) || prevToken.isProperNoun()) &&
 	prevToken.personNumberMatch(currToken) && prevToken.isCase(NOMINATIVE) &&
@@ -354,7 +354,8 @@ IF prevToken != null ;
 RULE currToken.lexeme.equalsIgnoreCase("við") &&  prevToken.isVerbAny() && currToken.personNumberMatch(prevToken) ;
 
 ELSE
-IF nextToken != null ;// innan undir er=sfg3en<v>_sfg1en<v>_ct_c
+IF nextToken != null ;
+// innan undir er=sfg3en<v>_sfg1en<v>_ct_c
 RULE nextToken.lexeme.equalsIgnoreCase("er") ;
 RULE nextToken.isOnlyVerbAny() ;
 RULE nextToken.isRelativeConjunction() ;

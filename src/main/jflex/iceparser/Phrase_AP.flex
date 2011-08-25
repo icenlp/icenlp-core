@@ -32,7 +32,7 @@ import java.io.*;
 %class Phrase_AP
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -63,7 +63,7 @@ import java.io.*;
 %include src/main/jflex/iceparser/regularDef.txt
 
 Adjective = {WordSpaces}{AdjectiveTag}
-AdverbPhrase = {OpenAdvP}~"aa"{WhiteSpace}+{CloseAdvP}
+AdverbPhrase = {OpenAdvP}~{encodeOpen}"aa"{encodeClose}{WhiteSpace}+{CloseAdvP}
 //AdverbPhrase = {OpenAdvP}{WordSpaces}"aa"{WhiteSpace}+{CloseAdvP}
 AdjectivePhrase = {AdverbPhrase}?{Adjective} 
 

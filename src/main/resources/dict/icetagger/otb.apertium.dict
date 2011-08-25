@@ -7,24 +7,67 @@
 # This section contains tag mapping rules.
 # The rules are on the form: oldtag newtag
 ##############################################
-[ <sent>
-] <sent>
-/ <sent>
-_ <sent>
-) <rpar>
-( <lpar>
-» <sent>
-« <sent>
 - <guio>
 ? <sent>
 ! <sent>
 . <sent>
-... <sent>
 ; <sent>
 : <sent>
 , <cm>
+
+# Mappings that include tags with multiple readings: <mf> = masculine,feminine,neuter, <sp> = singular,plural
+fsken_fskfn_fsven_fsvfn <prn><itg><mf><sp><nom>
+fskeo_fskfo_fsveo_fsvfo <prn><itg><mf><sp><acc>
+fskeþ_fskfþ_fsveþ_fsvfþ <prn><itg><mf><sp><dat>
+fskee_fskfe_fsvee_fsvfe <prn><itg><mf><sp><gen>
+
+# tveimur, tveggja, þremur, þriggja, fjórum, fjögurra, hundrað ...
+tfkfn_tfvfn <num><mf><pl><nom>
+tfkfo_tfvfo <num><mf><pl><acc>
+tfkfþ_tfvfþ <num><mf><pl><dat>
+tfkfe_tfvfe <num><mf><pl><gen>
+
+# Comparative adjectives, like "betri"
+lkenvm_lkfnvm_lvenvm_lvfnvm <adj><comp><mf><sp><nom><vei>
+lkeovm_lkfovm_lveovm_lvfovm <adj><comp><mf><sp><acc><vei>
+lkeþvm_lkfþvm_lveþvm_lvfþvm <adj><comp><mf><sp><dat><vei>
+lkeevm_lkfevm_lveevm_lvfevm <adj><comp><mf><sp><gen><vei>
+
+# Indeclineable adjectives, only analysed as <adj> in Apertium
+lkenof_lkeoof_lkeþof_lkeeof_lvenof_lveoof_lveþof_lveeof_lhenof_lheoof_lheþof_lheeof_lkfnof_lkfoof_lkfþof_lkfeof_lvfnof_lvfoof_lvfþof_lvfeof_lhfnof_lhfoof_lhfþof_lhfeof <adj>
+
+# A few indefinite pronouns are analysed as determiners in Apertium.  We map them to indefinite pronouns
+foken <det><ind><m><sg><nom>
+fokeo <det><ind><m><sg><acc>
+fokeþ <det><ind><m><sg><dat>
+fokee <det><ind><m><sg><gen>
+foven <det><ind><f><sg><nom>
+foveo <det><ind><f><sg><acc>
+foveþ <det><ind><f><sg><dat>
+fovee <det><ind><f><sg><gen>
+fohen <det><ind><nt><sg><nom>
+foheo <det><ind><nt><sg><acc>
+foheþ <det><ind><nt><sg><dat>
+fohee <det><ind><nt><sg><gen>
+fokfn <det><ind><m><pl><nom>
+fokfo <det><ind><m><pl><acc>
+fokfþ <det><ind><m><pl><dat>
+fokfe <det><ind><m><pl><gen>
+fovfn <det><ind><f><pl><nom>
+fovfo <det><ind><f><pl><acc>
+fovfþ <det><ind><f><pl><dat>
+fovfe <det><ind><f><pl><gen>
+fohfn <det><ind><nt><pl><nom>
+fohfo <det><ind><nt><pl><acc>
+fohfþ <det><ind><nt><pl><dat>
+fohfe <det><ind><nt><pl><gen>
+
+as <abbr>
 aam <adv><comp>
 aae <adv><sup>
+aa <cnjadv>
+aa <adv><itg>
+aa <adv><pst>
 aa <adv>
 aþm <pr>
 aþe <pr>
@@ -32,6 +75,8 @@ au <ij>
 ao <pr>
 aþ <pr>
 ae <pr>
+c <cnjcoo>
+c <cnjsub>
 c <cnj>
 ct <rel><an><mf><sp>
 cn <inf>
@@ -66,183 +111,188 @@ nheeg <n><nt><sg><gen><def>
 nheegö <np><top><nt><sg><gen><def>
 nheegs <np><al><nt><sg><gen><def>
 nhee <n><nt><sg><gen><ind>
-nhee-ö <np><top><nt><sg><gen><ind>
-nhee-s <np><al><nt><sg><gen><ind>
+nhee-ö <np><top><nt><sg><gen>
+nhee-s <np><al><nt><sg><gen>
 nheng <n><nt><sg><nom><def>
 nhengö <np><top><nt><sg><nom><def>
 nhengs <np><al><nt><sg><nom><def>
 nhen <n><nt><sg><nom><ind>
-nhen-ö <np><top><nt><sg><nom><ind>
-nhen-s <np><al><nt><sg><nom><ind>
+nhen-ö <np><top><nt><sg><nom>
+nhen-s <np><al><nt><sg><nom>
 nheog <n><nt><sg><acc><def>
 nheogö <np><top><nt><sg><acc><def>
 nheogs <np><al><nt><sg><acc><def>
 nheo <n><nt><sg><acc><ind>
-nheo-ö <np><top><nt><sg><acc><ind>
-nheo-s <np><al><nt><sg><acc><ind>
+nheo-ö <np><top><nt><sg><acc>
+nheo-s <np><al><nt><sg><acc>
 nheþg <n><nt><sg><dat><def>
 nheþgö <np><top><nt><sg><dat><def>
 nheþgs <np><al><nt><sg><dat><def>
 nheþ <n><nt><sg><dat><ind>
-nheþ-ö <np><top><nt><sg><dat><ind>
-nheþ-s <np><al><nt><sg><dat><ind>
+nheþ-ö <np><top><nt><sg><dat>
+nheþ-s <np><al><nt><sg><dat>
 nhfeg <n><nt><pl><gen><def>
 nhfegö <np><top><nt><pl><gen><def>
 nhfegs <np><al><nt><pl><gen><def>
 nhfe <n><nt><pl><gen><ind>
-nhfe-ö <np><top><nt><pl><gen><ind>
-nhfe-s <np><al><nt><pl><gen><ind>
+nhfe-ö <np><top><nt><pl><gen>
+nhfe-s <np><al><nt><pl><gen>
 nhfng <n><nt><pl><nom><def>
 nhfngö <np><top><nt><pl><nom><def>
 nhfngs <np><al><nt><pl><nom><def>
 nhfn <n><nt><pl><nom><ind>
-nhfn-ö <np><top><nt><pl><nom><ind>
-nhfn-s <np><al><nt><pl><nom><ind>
+nhfn-ö <np><top><nt><pl><nom>
+nhfn-s <np><al><nt><pl><nom>
 nhfog <n><nt><pl><acc><def>
 nhfogö <np><top><nt><pl><acc><def>
 nhfogs <np><al><nt><pl><acc><def>
 nhfo <n><nt><pl><acc><ind>
-nhfo-ö <np><top><nt><pl><acc><ind>
-nhfo-s <np><al><nt><pl><acc><ind>
+nhfo-ö <np><top><nt><pl><acc>
+nhfo-s <np><al><nt><pl><acc>
 nhfþg <n><nt><pl><dat><def>
 nhfþgö <np><top><nt><pl><dat><def>
 nhfþgs <np><al><nt><pl><dat><def>
 nhfþ <n><nt><pl><dat><ind>
-nhfþ-ö <np><top><nt><pl><dat><ind>
-nhfþ-s <np><al><nt><pl><dat><ind>
+nhfþ-ö <np><top><nt><pl><dat>
+nhfþ-s <np><al><nt><pl><dat>
 nkeeg <n><m><sg><gen><def>
 nkeegö <np><top><m><sg><gen><def>
 nkeegs <np><al><m><sg><gen><def>
-nkee-m <np><ant><m><sg><gen><ind>
+nkee-m <np><ant><m><sg><gen>
 nkee <n><m><sg><gen><ind>
-nkee-ö <np><top><m><sg><gen><ind>
-nkee-s <np><al><m><sg><gen><ind>
+nkee-ö <np><top><m><sg><gen>
+nkee-s <np><al><m><sg><gen>
 nkengm <np><ant><m><sg><nom><def>
 nkeng <n><m><sg><nom><def>
 nkengö <np><top><m><sg><nom><def>
 nkengs <np><al><m><sg><nom><def>
-nken-m <np><ant><m><sg><nom><ind>
+nken-m <np><ant><m><sg><nom>
 nken <n><m><sg><nom><ind>
-nken-ö <np><top><m><sg><nom><ind>
-nken-s <np><al><m><sg><nom><ind>
+nken-ö <np><top><m><sg><nom>
+nken-s <np><al><m><sg><nom>
 nkeogm <np><ant><m><sg><acc><def>
 nkeog <n><m><sg><acc><def>
 nkeogö <np><top><m><sg><acc><def>
 nkeogs <np><al><m><sg><acc><def>
-nkeo-m <np><ant><m><sg><acc><ind>
+nkeo-m <np><ant><m><sg><acc>
 nkeo <n><m><sg><acc><ind>
-nkeo-ö <np><top><m><sg><acc><ind>
-nkeo-s <np><al><m><sg><acc><ind>
+nkeo-ö <np><top><m><sg><acc>
+nkeo-s <np><al><m><sg><acc>
 nkeþg <n><m><sg><dat><def>
 nkeþgö <np><top><m><sg><dat><def>
 nkeþgs <np><al><m><sg><dat><def>
-nkeþ-m <np><ant><m><sg><dat><ind>
+nkeþ-m <np><ant><m><sg><dat>
 nkeþ <n><m><sg><dat><ind>
-nkeþ-ö <np><top><m><sg><dat><ind>
-nkeþ-s <np><al><m><sg><dat><ind>
+nkeþ-ö <np><top><m><sg><dat>
+nkeþ-s <np><al><m><sg><dat>
 nkfeg <n><m><pl><gen><def>
 nkfegs <np><al><m><pl><gen><def>
-nkfe-m <np><ant><m><pl><gen><ind>
+nkfe-m <np><ant><m><pl><gen>
 nkfe <n><m><pl><gen><ind>
-nkfe-ö <np><top><m><pl><gen><ind>
-nkfe-s <np><al><m><pl><gen><ind>
+nkfe-ö <np><top><m><pl><gen>
+nkfe-s <np><al><m><pl><gen>
 nkfngm <np><ant><m><pl><nom><def>
 nkfng <n><m><pl><nom><def>
 nkfngö <np><top><m><pl><nom><def>
 nkfngs <np><al><m><pl><nom><def>
-nkfn-m <np><ant><m><pl><nom><ind>
+nkfn-m <np><ant><m><pl><nom>
 nkfn <n><m><pl><nom><ind>
-nkfn-ö <np><top><m><pl><nom><ind>
-nkfn-s <np><al><m><pl><nom><ind>
+nkfn-ö <np><top><m><pl><nom>
+nkfn-s <np><al><m><pl><nom>
 nkfogm <np><ant><m><pl><acc><def>
 nkfog <n><m><pl><acc><def>
 nkfogs <np><al><m><pl><acc><def>
 nkfo <n><m><pl><acc><ind>
-nkfo-ö <np><top><m><pl><acc><ind>
-nkfo-s <np><al><m><pl><acc><ind>
+nkfo-ö <np><top><m><pl><acc>
+nkfo-s <np><al><m><pl><acc>
 nkfþg <n><m><pl><dat><def>
 nkfþgö <np><top><m><pl><dat><def>
 nkfþgs <np><al><m><pl><dat><def>
-nkfþ-m <np><ant><m><pl><dat><ind>
+nkfþ-m <np><ant><m><pl><dat>
 nkfþ <n><m><pl><dat><ind>
-nkfþ-ö <np><top><m><pl><dat><ind>
-nkfþ-s <np><al><m><pl><dat><ind>
+nkfþ-ö <np><top><m><pl><dat>
+nkfþ-s <np><al><m><pl><dat>
 nveegm <np><ant><f><sg><gen><def>
 nveeg <n><f><sg><gen><def>
 nveegö <np><top><f><sg><gen><def>
 nveegs <np><al><f><sg><gen><def>
-nvee-m <np><ant><f><sg><gen><ind>
+nvee-m <np><ant><f><sg><gen>
 nvee <n><f><sg><gen><ind>
-nvee-ö <np><top><f><sg><gen><ind>
-nvee-s <np><al><f><sg><gen><ind>
+nvee-ö <np><top><f><sg><gen>
+nvee-s <np><al><f><sg><gen>
 nvengm <np><ant><f><sg><nom><def>
 nveng <n><f><sg><nom><def>
 nvengö <np><top><f><sg><nom><def>
 nvengs <np><al><f><sg><nom><def>
-nven-m <np><ant><f><sg><nom><ind>
+nven-m <np><ant><f><sg><nom>
 nven <n><f><sg><nom><ind>
-nven-ö <np><top><f><sg><nom><ind>
-nven-s <np><al><f><sg><nom><ind>
+nven-ö <np><top><f><sg><nom>
+nven-s <np><al><f><sg><nom>
 nveogm <np><ant><f><sg><acc><def>
 nveog <n><f><sg><acc><def>
 nveogö <np><top><f><sg><acc><def>
 nveogs <np><al><f><sg><acc><def>
-nveo-m <np><ant><f><sg><acc><ind>
+nveo-m <np><ant><f><sg><acc>
 nveo <n><f><sg><acc><ind>
-nveo-ö <np><top><f><sg><acc><ind>
-nveo-s <np><al><f><sg><acc><ind>
+nveo-ö <np><top><f><sg><acc>
+nveo-s <np><al><f><sg><acc>
 nveþgm <np><ant><f><sg><dat><def>
 nveþg <n><f><sg><dat><def>
 nveþgö <np><top><f><sg><dat><def>
 nveþgs <np><al><f><sg><dat><def>
-nveþ-m <np><ant><f><sg><dat><ind>
+nveþ-m <np><ant><f><sg><dat>
 nveþ <n><f><sg><dat><ind>
-nveþ-ö <np><top><f><sg><dat><ind>
-nveþ-s <np><al><f><sg><dat><ind>
+nveþ-ö <np><top><f><sg><dat>
+nveþ-s <np><al><f><sg><dat>
 nvfeg <n><f><pl><gen><def>
 nvfegö <np><top><f><pl><gen><def>
 nvfegs <np><al><f><pl><gen><def>
 nvfe <n><f><pl><gen><ind>
-nvfe-ö <np><top><f><pl><gen><ind>
-nvfe-s <np><al><f><pl><gen><ind>
+nvfe-ö <np><top><f><pl><gen>
+nvfe-s <np><al><f><pl><gen>
 nvfng <n><f><pl><nom><def>
 nvfngö <np><top><f><pl><nom><def>
 nvfngs <np><al><f><pl><nom><def>
-nvfn-m <np><ant><f><pl><nom><ind>
+nvfn-m <np><ant><f><pl><nom>
 nvfn <n><f><pl><nom><ind>
-nvfn-ö <np><top><f><pl><nom><ind>
-nvfn-s <np><al><f><pl><nom><ind>
+nvfn-ö <np><top><f><pl><nom>
+nvfn-s <np><al><f><pl><nom>
 nvfog <n><f><pl><acc><def>
 nvfogö <np><top><f><pl><acc><def>
 nvfogs <np><al><f><pl><acc><def>
 nvfo <n><f><pl><acc><ind>
-nvfo-ö <np><top><f><pl><acc><ind>
-nvfo-s <np><al><f><pl><acc><ind>
+nvfo-ö <np><top><f><pl><acc>
+nvfo-s <np><al><f><pl><acc>
 nvfþg <n><f><pl><dat><def>
 nvfþgö <np><top><f><pl><dat><def>
 nvfþgs <np><al><f><pl><dat><def>
 nvfþ <n><f><pl><dat><ind>
-nvfþ-ö <np><top><f><pl><dat><ind>
-nvfþ-s <np><al><f><pl><dat><ind>
-nxee-m <np><ant><mfn><sg><gen><ind>
+nvfþ-ö <np><top><f><pl><dat>
+nvfþ-s <np><al><f><pl><dat>
+nxee-m <np><ant><mfn><sg><gen>
 nxee <n><mfn><sg><gen><ind>
-nxee-ö <np><top><mfn><sg><gen><ind>
-nxee-s <np><al><mfn><sg><gen><ind>
-nxen-m <np><ant><mfn><sg><nom><ind>
+nxee-ö <np><top><mfn><sg><gen>
+nxee-s <np><al><mfn><sg><gen>
+nxen-m <np><ant><mfn><sg><nom>
 nxen <n><mfn><sg><nom><ind>
-nxen-ö <np><top><mfn><sg><nom><ind>
-nxen-s <np><al><mfn><sg><nom><ind>
-nxeo-m <np><ant><mfn><sg><acc><ind>
+nxen-ö <np><top><mfn><sg><nom>
+nxen-s <np><al><mfn><sg><nom>
+nxeo-m <np><ant><mfn><sg><acc>
 nxeo <n><mfn><sg><acc><ind>
-nxeo-ö <np><top><mfn><sg><acc><ind>
-nxeo-s <np><al><mfn><sg><acc><ind>
+nxeo-ö <np><top><mfn><sg><acc>
+nxeo-s <np><al><mfn><sg><acc>
 nxeþ <n><mfn><sg><dat><ind>
-nxeþ-ö <np><top><mfn><sg><dat><ind>
-nxeþ-s <np><al><mfn><sg><dat><ind>
-nxfn-s <np><al><mfn><pl><nom><ind>
+nxeþ-ö <np><top><mfn><sg><dat>
+nxeþ-s <np><al><mfn><sg><dat>
+nxfn-s <np><al><mfn><pl><nom>
 nxfo <n><mfn><pl><acc><ind>
-slg <vblex><ppres>
-slm <vblex><ppres>
+# Organisations are recognized with regular expressions in Apertium.
+# We map them to a tag that is not part of the IceTagger tagset (o = organisation)
+nken-o <np><org><mf><sp>
+
+slm <vblex><pprs>
+slg <vblex><actv><pprs>
+slg <vblex><pprs>
 sng <vblex><actv><inf>
 sng--þ <vblex><actv><inf>
 snm <vblex><midv><inf>
@@ -250,7 +300,7 @@ ssg <vblex><actv><supn>
 ssm <vblex><midv><supn>
 sbg2en <vblex><actv><imp><p2><sg>
 sbg2fn <vblex><actv><imp><p2><pl>
-sbm2en <vblex><actv><imp><p2><sg>
+sbm2en <vblex><midv><imp><p2><sg>
 sfg1en <vblex><actv><pri><p1><sg>
 sfg2en <vblex><actv><pri><p2><sg>
 sfg3en <vblex><actv><pri><p3><sg>
@@ -301,16 +351,28 @@ svm2fþ <vblex><midv><pss><p2><pl>
 svm3fþ <vblex><midv><pss><p3><pl>
 sþghen <vblex><actv><pp><nt><sg><nom>
 sþgheo <vblex><actv><pp><nt><sg><acc>
+sþgheþ <vblex><actv><pp><nt><sg><dat>
+sþghee <vblex><actv><pp><nt><sg><gen>
 sþghfn <vblex><actv><pp><nt><pl><nom>
 sþghfo <vblex><actv><pp><nt><pl><acc>
+sþghfþ <vblex><actv><pp><nt><pl><dat>
+sþghfe <vblex><actv><pp><nt><pl><gen>
 sþgken <vblex><actv><pp><m><sg><nom>
 sþgkeo <vblex><actv><pp><m><sg><acc>
+sþgkeþ <vblex><actv><pp><m><sg><dat>
+sþgkee <vblex><actv><pp><m><sg><gen>
 sþgkfn <vblex><actv><pp><m><pl><nom>
 sþgkfo <vblex><actv><pp><m><pl><acc>
+sþgkfþ <vblex><actv><pp><m><pl><dat>
+sþgkfe <vblex><actv><pp><m><pl><gen>
 sþgven <vblex><actv><pp><f><sg><nom>
 sþgveo <vblex><actv><pp><f><sg><acc>
+sþgveþ <vblex><actv><pp><f><sg><dat>
+sþgvee <vblex><actv><pp><f><sg><gen>
 sþgvfn <vblex><actv><pp><f><pl><nom>
 sþgvfo <vblex><actv><pp><f><pl><acc>
+sþgvfþ <vblex><actv><pp><f><pl><dat>
+sþgvfe <vblex><actv><pp><f><pl><gen>
 sþmhen <vblex><midv><pp><nt><sg><nom>
 sþmhfn <vblex><midv><pp><nt><pl><nom>
 sþmken <vblex><midv><pp><m><sg><nom>
@@ -413,30 +475,30 @@ fevfe <prn><pos><f><pl><gen>
 fevfn <prn><pos><f><pl><nom>
 fevfo <prn><pos><f><pl><acc>
 fevfþ <prn><pos><f><pl><dat>
-fohee <prn><qnt><nt><sg><gen>
-fohen <prn><qnt><nt><sg><nom>
-foheo <prn><qnt><nt><sg><acc>
-foheþ <prn><qnt><nt><sg><dat>
-fohfe <prn><qnt><nt><pl><gen>
-fohfn <prn><qnt><nt><pl><nom>
-fohfo <prn><qnt><nt><pl><acc>
-fohfþ <prn><qnt><nt><pl><dat>
-fokee <prn><qnt><m><sg><gen>
-foken <prn><qnt><m><sg><nom>
-fokeo <prn><qnt><m><sg><acc>
-fokeþ <prn><qnt><m><sg><dat>
-fokfe <prn><qnt><m><pl><gen>
-fokfn <prn><qnt><m><pl><nom>
-fokfo <prn><qnt><m><pl><acc>
-fokfþ <prn><qnt><m><pl><dat>
-fovee <prn><qnt><f><sg><gen>
-foven <prn><qnt><f><sg><nom>
-foveo <prn><qnt><f><sg><acc>
-foveþ <prn><qnt><f><sg><dat>
-fovfe <prn><qnt><f><pl><gen>
-fovfn <prn><qnt><f><pl><nom>
-fovfo <prn><qnt><f><pl><acc>
-fovfþ <prn><qnt><f><pl><dat>
+fohee <prn><ind><nt><sg><gen>
+fohen <prn><ind><nt><sg><nom>
+foheo <prn><ind><nt><sg><acc>
+foheþ <prn><ind><nt><sg><dat>
+fohfe <prn><ind><nt><pl><gen>
+fohfn <prn><ind><nt><pl><nom>
+fohfo <prn><ind><nt><pl><acc>
+fohfþ <prn><ind><nt><pl><dat>
+fokee <prn><ind><m><sg><gen>
+foken <prn><ind><m><sg><nom>
+fokeo <prn><ind><m><sg><acc>
+fokeþ <prn><ind><m><sg><dat>
+fokfe <prn><ind><m><pl><gen>
+fokfn <prn><ind><m><pl><nom>
+fokfo <prn><ind><m><pl><acc>
+fokfþ <prn><ind><m><pl><dat>
+fovee <prn><ind><f><sg><gen>
+foven <prn><ind><f><sg><nom>
+foveo <prn><ind><f><sg><acc>
+foveþ <prn><ind><f><sg><dat>
+fovfe <prn><ind><f><pl><gen>
+fovfn <prn><ind><f><pl><nom>
+fovfo <prn><ind><f><pl><acc>
+fovfþ <prn><ind><f><pl><dat>
 fp1ee <prn><p1><mf><sg><gen>
 fp1en <prn><p1><mf><sg><nom>
 fp1eo <prn><p1><mf><sg><acc>
@@ -647,6 +709,56 @@ lvfþof <adj><pst><f><pl><dat><idk>
 lkfþof <adj><pst><m><pl><dat><idk>
 lhfþof <adj><pst><nt><pl><dat><idk>
 
+# Tölulýsingarorð, t.d. fyrstur, annar
+lveoso <adj><ord><f><sg><acc><sta>
+lkeoso <adj><ord><m><sg><acc><sta>
+lheoso <adj><ord><nt><sg><acc><sta>
+lvfoso <adj><ord><f><pl><acc><sta>
+lkfoso <adj><ord><m><pl><acc><sta>
+lhfoso <adj><ord><nt><pl><acc><sta>
+lvenso <adj><ord><f><sg><nom><sta>
+lkenso <adj><ord><m><sg><nom><sta>
+lhenso <adj><ord><nt><sg><nom><sta>
+lvfnso <adj><ord><f><pl><nom><sta>
+lkfnso <adj><ord><m><pl><nom><sta>
+lhfnso <adj><ord><nt><pl><nom><sta>
+lveeso <adj><ord><f><sg><gen><sta>
+lkeeso <adj><ord><m><sg><gen><sta>
+lheeso <adj><ord><nt><sg><gen><sta>
+lvfeso <adj><ord><f><pl><gen><sta>
+lkfeso <adj><ord><m><pl><gen><sta>
+lhfeso <adj><ord><nt><pl><gen><sta>
+lveþso <adj><ord><f><sg><dat><sta>
+lkeþso <adj><ord><m><sg><dat><sta>
+lheþso <adj><ord><nt><sg><dat><sta>
+lvfþso <adj><ord><f><pl><dat><sta>
+lkfþso <adj><ord><m><pl><dat><sta>
+lhfþso <adj><ord><nt><pl><dat><sta>
+lveovo <adj><ord><f><sg><acc><vei>
+lkeovo <adj><ord><m><sg><acc><vei>
+lheovo <adj><ord><nt><sg><acc><vei>
+lvfovo <adj><ord><f><pl><acc><vei>
+lkfovo <adj><ord><m><pl><acc><vei>
+lhfovo <adj><ord><nt><pl><acc><vei>
+lvenvo <adj><ord><f><sg><nom><vei>
+lkenvo <adj><ord><m><sg><nom><vei>
+lhenvo <adj><ord><nt><sg><nom><vei>
+lvfnvo <adj><ord><f><pl><nom><vei>
+lkfnvo <adj><ord><m><pl><nom><vei>
+lhfnvo <adj><ord><nt><pl><nom><vei>
+lveevo <adj><ord><f><sg><gen><vei>
+lkeevo <adj><ord><m><sg><gen><vei>
+lheevo <adj><ord><nt><sg><gen><vei>
+lvfevo <adj><ord><f><pl><gen><vei>
+lkfevo <adj><ord><m><pl><gen><vei>
+lhfevo <adj><ord><nt><pl><gen><vei>
+lveþvo <adj><ord><f><sg><dat><vei>
+lkeþvo <adj><ord><m><sg><dat><vei>
+lheþvo <adj><ord><nt><sg><dat><vei>
+lvfþvo <adj><ord><f><pl><dat><vei>
+lkfþvo <adj><ord><m><pl><dat><vei>
+lhfþvo <adj><ord><nt><pl><dat><vei>
+
 
 [LEMMA]
 ###############################################################
@@ -659,6 +771,15 @@ hafa <vblex><actv> <vbhaver>
 mega <vblex><actv> <vaux>
 munu <vblex><actv> <vaux>
 skulu <vblex><actv> <vaux>
+
+# A few indefinite pronouns are analysed as determiners in Apertium.
+annar <prn> <det>
+báðir <prn> <det>
+enginn <prn> <det>
+einhver <prn> <det>
+neinn <prn> <det>
+slíkur <prn> <det>
+ýmis <prn> <det>
 
 Samfylking <al> <org>
 Landsbanki <al> <org>
@@ -685,7 +806,8 @@ hvert <adv> <adv><itg>
 hví <adv> <adv><itg>
 
 að <cnj> <cnjsub>
-annaðhvort <cnj> <cnjsub>
+afhverju <adv> <adv><itg>
+annaðhvort <cnj> <cnjcoo>
 bæði <cnj> <cnjsub>
 og <cnj> <cnjcoo>
 eð <cnj> <cnjsub>
@@ -697,8 +819,11 @@ en <cnj> <cnjcoo>
 enn <cnj> <cnjcoo>
 er <cnj> <cnjsub>
 fyrst <cnj> <cnjsub>
-heldur <cnj> <cnjsub>
-hvorki <cnj> <cnjsub>
+hafandi <vblex> <vbhaver>
+heldur <cnj> <cnjcoo>
+hverskonar <adv> <adv><itg>
+hversu <adv> <adv><itg>
+hvorki <cnj> <cnjcoo>
 hvort <cnj> <cnjsub>
 meðan <cnj> <cnjsub>
 nema <cnj> <cnjsub>
@@ -709,12 +834,59 @@ síðan <cnj> <cnjsub>
 svo <adv> <cnjadv>
 tilað <cnj> <cnjsub>
 uns <cnj> <cnjsub>
+verandi <vblex> <vbser>
 ýmist <cnj> <cnjsub>
 þegar <cnj> <cnjsub>
 þarsem <cnj> <cnjsub>
 þó <cnj> <cnjsub>
 þótt <cnj> <cnjsub>
 
+#MWE Exceptions
+að_því_er <cnj> <cnjsub>
+af_hverju <adv> <adv><itg>
+af_því_að <cnj> <cnjsub>
+alveg_eins_og <adv> <cnjadv>
+á_meðan <cnj> <cnjsub>
+án_þess <adv> <cnjadv>
+áður_en <cnj> <cnjsub>
+eftir_að <adv> <cnjadv>
+eins_og <cnj> <cnjsub>
+ekki_fyrr_en <adv> <cnjadv>
+enda_þótt <adv> <cnjadv>
+engu_líkara_en <adv> <cnjadv>
+frá_og_með <adv> <cnjadv>
+fyrr_en <cnj> <cnjsub>
+fyrir_því_að <cnj> <cnjsub>
+heldur_en <cnj> <cnjcoo>
+hvers_konar <adv> <adv><itg>
+hvers_vegna <adv> <adv><itg>
+líkt_og <cnj> <cnjsub>
+með_tilliti_til <adv> <cnjadv>
+meira_en <cnj> <cnjsub>
+rétt_eins_og <adv> <cnjadv>
+sem_og <adv> <cnjadv>
+skömmu_eftir_að <adv> <cnjadv>
+strax_og <cnj> <cnjsub>
+svo_að <cnj> <cnjsub>
+svo_mikið_sem <adv> <cnjadv>
+svo_framarlega_sem <adv> <cnjadv>
+sökum_þess_að <cnj> <cnjsub>
+til_að <cnj> <cnjsub>
+til_þess_að <cnj> <cnjsub>
+um_leið_og <adv> <cnjadv>
+undireins_og <adv> <cnjadv>
+úr_því_að <cnj> <cnjsub>
+vegna_þess_að <cnj> <cnjsub>
+ýmiss_konar <adv> <adv><itg>
+þangað_til_að <adv> <cnjadv>
+þannig_að <adv> <cnjadv>
+þar_sem <cnj> <cnjsub>
+þar_til <adv> <cnjadv>
+þá_er <cnj> <cnjsub>
+þó_að <cnj> <cnjsub>
+því_að <cnj> <cnjsub>
+því_aðeins_að <adv> <cnjadv>
+því_ekki_það <adv> <adv><itg>
 
 [MWE]
 ########################################

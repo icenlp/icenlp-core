@@ -36,7 +36,7 @@ public class Token {
                 tcSlash,  tcBackSlash, tcUrl, tcLess, tcGreater, tcSingleQuote, tcMultiWord,
                 tcLArrow, tcRArrow, tcPlus, tcStar, tcDollar, tcAnd, tcNumberSign, tcEqualSign,
                 tcPlusMinus, tcUnderscore, tcArrow, tcLCurlyBracket, tcRCurlyBracket, tcPound,
-                tcWebAddress
+                tcHat, tcWebAddress
                 //tcBackQuote, tcTwoSingleQuotes, tcTwoBackQuotes
                 }
     
@@ -48,6 +48,7 @@ public class Token {
     
     // hs added
     public boolean linkedToPreviousWord;
+    public String preSpace = null;
     
 
     public Token()
@@ -116,6 +117,7 @@ public class Token {
         case tcDollar:
         case tcLCurlyBracket:
         case tcRCurlyBracket:
+        case tcHat:
                     return true;
         default:    return false;
 

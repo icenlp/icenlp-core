@@ -31,7 +31,9 @@ import java.io.*;
  */
 public class IceParserFacade
 {
+	private TagEncoder tagEncdr;
     private Preprocess preprocess_scn;
+	private Phrase_FOREIGN frw_scn;
     private Phrase_MWE mwe_scn;
     private Phrase_MWEP1 mwep1_scn;
     private Phrase_MWEP2 mwep2_scn;
@@ -39,6 +41,7 @@ public class IceParserFacade
     private Phrase_AP ap_scn;
     private Phrase_APs aps_scn;
     private Phrase_NP np_scn;
+	private Phrase_NP2 np2_scn;
     private Phrase_VP vp_scn;
     private Case_AP cap_scn;
     private Case_NP cnp_scn;
@@ -55,12 +58,16 @@ public class IceParserFacade
     private Func_SUBJ2 f_subj2_scn;
     private Clean2 cl2_scn;
     private Phrase_Per_Line ppl_scn;
+	private TagDecoder tagDecdr;
+	private OutputFormatter outFormatter;
 
 
     public IceParserFacade()
 	{
         StringReader sr = new StringReader("test");
+		tagEncdr = new TagEncoder(sr);
         preprocess_scn = new Preprocess(sr);
+		frw_scn = new Phrase_FOREIGN(sr);
         mwe_scn = new Phrase_MWE(sr);
         mwep1_scn = new Phrase_MWEP1(sr);
         mwep2_scn = new Phrase_MWEP2(sr);
@@ -68,6 +75,7 @@ public class IceParserFacade
         ap_scn = new Phrase_AP(sr);
         aps_scn = new Phrase_APs(sr);
         np_scn = new Phrase_NP(sr);
+		np2_scn = new Phrase_NP2(sr);
         vp_scn = new Phrase_VP(sr);
         cap_scn = new Case_AP(sr);
         cnp_scn = new Case_NP(sr);
@@ -84,34 +92,50 @@ public class IceParserFacade
         f_subj2_scn = new Func_SUBJ2(sr);
         cl2_scn = new Clean2(sr);
         ppl_scn = new Phrase_Per_Line(sr);
+		tagDecdr = new TagDecoder(sr);
+		outFormatter = new OutputFormatter();
     }
 
-	private void print( String text )
-	{
-		//System.out.println( text );
-	}
-
-	public String parse( String text ) throws IOException
-	{
-		return parse( text, false, false );
-	}
-
-	public String parse( String text, boolean include_func ) throws IOException
-	{
-		return parse( text, include_func, false );
-	}
 
 	public String parse( String text, boolean include_func, boolean one_phrase_per_line ) throws IOException
 	{
+		if (one_phrase_per_line)
+            return parse( text, OutputFormatter.OutputType.phrase_per_line, include_func, false, false, false);
+        else
+            return parse( text, OutputFormatter.OutputType.plain, include_func, false, false, false);
+	}
+
+	public String parse( String text, OutputFormatter.OutputType outType, boolean include_func, boolean agreement, boolean markGrammarError, boolean mergeLabels) throws IOException
+	{
+		
+		// --------------------------------
+        //print( "tagEncdr" );
 		StringReader sr = new StringReader( text );
 		StringWriter sw = new StringWriter( );
+		
+		tagEncdr.yyclose();
+		tagEncdr.yyreset(sr);
+		tagEncdr.parse(sw);		
 
-// --------------------------------
-        //print( "Phrase_MWE" );
+		// --------------------------------
+        //print( "preprocess" );
+        sr = new StringReader( sw.toString() );
+        sw = new StringWriter( );
+
 
         preprocess_scn.yyclose();
         preprocess_scn.yyreset(sr);
         preprocess_scn.parse(sw);
+
+		// --------------------------------
+		//print( "Phrase_FOREIGN" );
+
+        sr = new StringReader( sw.toString() );
+        sw = new StringWriter( );
+
+		frw_scn.yyclose();
+		frw_scn.yyreset(sr);
+		frw_scn.parse(sw);
 
 		// --------------------------------
 		//print( "Phrase_MWE" );
@@ -182,9 +206,24 @@ public class IceParserFacade
 		sr = new StringReader( sw.toString() );
 		sw = new StringWriter( );
 
+        np_scn.set_doAgreementCheck(agreement);
+        np_scn.set_markGrammarError(markGrammarError);
+
         np_scn.yyclose();
         np_scn.yyreset(sr);
         np_scn.parse(sw);
+		
+		if(agreement && !markGrammarError)
+		{
+			// --------------------------------
+        	//print( "phrase_NP2" );
+			sr = new StringReader( sw.toString() );
+			sw = new StringWriter();
+			
+			np2_scn.yyclose();
+			np2_scn.yyreset(sr);
+			np2_scn.parse(sw);
+		}
 
         // --------------------------------
 		//print( "Phrase_VP" );
@@ -256,6 +295,9 @@ public class IceParserFacade
 			//print( "Func_SUBJ" );
 			sr = new StringReader( sw.toString() );
 			sw = new StringWriter( );
+			
+            f_subj_scn.set_doAgreementCheck(agreement);
+            f_subj_scn.set_markGrammarError(markGrammarError);
 
             f_subj_scn.yyclose();
             f_subj_scn.yyreset(sr);
@@ -316,7 +358,9 @@ public class IceParserFacade
         cl2_scn.yyreset(sr);
         cl2_scn.parse(sw);
 
-		if( one_phrase_per_line )
+        //if labels are merged then phrase per line is done in the outputFormatter
+		//if( one_phrase_per_line && !mergeLabels)
+        if( outType == OutputFormatter.OutputType.phrase_per_line && !mergeLabels)
 		{
             sr = new StringReader( sw.toString() );
             sw = new StringWriter( );
@@ -327,10 +371,32 @@ public class IceParserFacade
             ppl_scn.yyreset(sr);
             ppl_scn.parse(sw);
 		}
-		return sw.toString();
+
+		// --------------------------------
+		//print( "tagDecdr" );
+        sr = new StringReader( sw.toString() );
+        sw = new StringWriter( );		
+
+		tagDecdr.yyclose();
+		tagDecdr.yyreset(sr);
+		tagDecdr.parse(sw);
+
+        // Run the Output formatter?
+        if (mergeLabels || (! (outType == OutputFormatter.OutputType.plain || outType == OutputFormatter.OutputType.phrase_per_line)))
+        {
+
+            String result = outFormatter.parse(sw.toString(), outType, mergeLabels);
+            return result;
+        }
+        else
+		    return sw.toString();
 	}
 
-	public static void main( String[] args )
+    public String finish()
+    {
+        return outFormatter.finish();
+    }
+	/*public static void main( String[] args )
 	{
 		System.out.println( "Testing parser" );
 		long start = System.currentTimeMillis();
@@ -351,6 +417,5 @@ public class IceParserFacade
 		long duration = (end-start);
 		System.out.println( "Time (msec):"+duration );
 
-
-	}
+	}*/
 }

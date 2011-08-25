@@ -82,7 +82,7 @@ public class IceTag extends Tag {
    public static final char cActive = 'g';
    public static final char cMiddle = 'm';
 
-   public static final char cInfinitive = 'g';
+   public static final char cInfinitive = 'n';
    public static final char cImperative = 'b';
    public static final char cIndicative = 'f';
    public static final char cSubjunctive = 'v';
@@ -250,6 +250,12 @@ public class IceTag extends Tag {
          interpretTag();            // The tag has now changed to a Proper Noun
      }
 
+   }
+
+   public void setOtherName()
+   {
+       if (isProperNoun())
+         tagStr.setCharAt(5, cOtherName);
    }
 
    public void setPersonName()

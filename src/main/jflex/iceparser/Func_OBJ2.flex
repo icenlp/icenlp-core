@@ -35,7 +35,7 @@ import java.io.*;
 %class Func_OBJ2
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -132,80 +132,219 @@ SubjVerbObjNom = {FuncSubjectOblique}{WhiteSpace}+{VPDat}{WhiteSpace}+{NomSubjec
 VerbSubjObjNom = {VPDat}{WhiteSpace}+{FuncSubjectOblique}{WhiteSpace}+{NomSubject}
 
 %%
+{VerbDatObjAccObj}
+	{
+	//System.err.println("obj2-1"); 
+	//System.err.println(yytext());
 
-{VerbDatObjAccObj}	{ 
-			/* First mark the object as an indirect object */
 			String matchedStr = yytext();
-			String newStr = matchedStr.replaceAll("\\*OBJ<","*IOBJ<");	/* change to indirect object */
+			String newStr = matchedStr.replaceAll("\\*OBJ<","*IOBJ<");	// change to indirect object
 			
-			if (newStr.contains("PP]")) {	
-				StringSearch.splitString(newStr,"PP]", true, 3);		
+			//making sure to check for the tags after the object and before the NPa because the same tags can occur elsewhere
+			int objIndex = newStr.indexOf("*IOBJ<}");
+			String afterObj = newStr.substring(objIndex, newStr.length());
+
+			int npIndex = afterObj.lastIndexOf("[NPs ");
+			if(npIndex == -1)
+				npIndex = afterObj.lastIndexOf("[NPa ");
+			if(npIndex != -1)
+				npIndex += objIndex;
+
+			String middlePart = newStr.substring(newStr.indexOf("*IOBJ<}")+7, npIndex);
+	//System.err.println("\n\nMiddlePart: " + middlePart + "\n\n");
+			if (middlePart.contains(" PP]")) {	
+				theIndex = StringSearch.splitString(newStr," PP]", true, 4);
 			}
-			else if (newStr.contains("AdvP]")) {	
-				StringSearch.splitString(newStr,"AdvP]", true, 5);		
+			else if (middlePart.contains(" AdvP]")) {
+				theIndex = StringSearch.splitString(newStr," AdvP]", true, 6);		
 			}
 			else {
-				/* Find where the FuncObject phrase ended and insert the OBJ label */
-				StringSearch.splitString(newStr,"*IOBJ<}", false, 7);		
+				// Find where the FuncObject phrase ended and insert the OBJ label 
+				theIndex = StringSearch.splitString(newStr,"*IOBJ<}", false, 7);		
 			}
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			}
+
+
+
+/*
+
+			// First mark the object as an indirect object 
+			
+			String matchedStr = yytext();
+			String newStr = matchedStr.replaceAll("\\*OBJ<","*IOBJ<");	// change to indirect object
+			
+			if (newStr.contains("PP]")) {	
+				theIndex = StringSearch.splitString(newStr,"PP]", true, 3);		
+			}
+			else if (newStr.contains("AdvP]")) {		
+				theIndex = StringSearch.splitString(newStr,"AdvP]", true, 5);		
+			}
+			else {
+				// Find where the FuncObject phrase ended and insert the OBJ label 
+				theIndex = StringSearch.splitString(newStr,"*IOBJ<}", false, 7);		
+			}
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			}
+*/
 		} 		
 {VerbAccObjDatObj}	{ 
-			/* The first object is the direct object */
+	//System.err.println("obj2-2");
+	//System.err.println(yytext());
+
+			// The first object is the direct object 
+			String matchedStr = yytext();
+			
+			int vpIndex = matchedStr.indexOf(" VP]") + 4;
+			String middlePart = matchedStr.substring(vpIndex, matchedStr.length());
+
+			String first = "";
+			String second = "";
+
+			if (middlePart.contains(" PP]")) {	
+				int ppIndex = middlePart.indexOf(" PP]") + 4;
+				first = matchedStr.substring(0, vpIndex + ppIndex);		
+				second = matchedStr.substring(vpIndex + ppIndex, matchedStr.length());
+			}
+			else if (middlePart.contains("AdvP]")) {	
+				int advpIndex = middlePart.indexOf("AdvP]") + 5;
+				first = matchedStr.substring(0, vpIndex + advpIndex);
+				second = matchedStr.substring(vpIndex + advpIndex, matchedStr.length());	
+			}
+			else {
+				// Find where the FuncObject phrase ended and insert the IOBJ label 
+				int objIndex = middlePart.indexOf("*OBJ<}") + 6;
+				first = matchedStr.substring(0, vpIndex + objIndex);
+				second = matchedStr.substring(vpIndex + objIndex, matchedStr.length());	
+			}
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(first+IObjOpen+second+IObjClose);
+			}
+
+/*
+			// The first object is the direct object 
 			String matchedStr = yytext();
 			
 			if (matchedStr.contains("PP]")) {	
-				StringSearch.splitString(matchedStr,"PP]", true, 3);		
+				theIndex = StringSearch.splitString(matchedStr,"PP]", true, 3);		
 			}
 			else if (matchedStr.contains("AdvP]")) {	
-				StringSearch.splitString(matchedStr,"AdvP]", true, 5);		
+				theIndex = StringSearch.splitString(matchedStr,"AdvP]", true, 5);		
 			}
 			else {
-				/* Find where the FuncObject phrase ended and insert the IOBJ label */
-				StringSearch.splitString(matchedStr,"*OBJ<}", false, 6);		
+				// Find where the FuncObject phrase ended and insert the IOBJ label 
+				theIndex = StringSearch.splitString(matchedStr,"*OBJ<}", false, 6);		
 			}
-			out.write(StringSearch.firstString+IObjOpen+StringSearch.nextString+IObjClose);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+IObjOpen+StringSearch.nextString+IObjClose);
+			}
+*/
 		} 		
 
 {ComplObj}	{ 
+	//System.err.println("obj2-3");
 			/* Find where the Complement function ended and insert the OBJ label */
 			theIndex = StringSearch.splitString(yytext(),"*COMP<}", true, 7);		
 			if (theIndex == -1)
 				theIndex = StringSearch.splitString(yytext(),"*COMP}", true, 6);			
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			}
 		}
 
 {ComplCompl}	{ 
+	//System.err.println("obj2-4");
 			/* Find where the Complement function ended and insert the COMP label */
 			theIndex = StringSearch.splitString(yytext(),"*COMP<}", true, 7);		
 			if (theIndex == -1)
 				theIndex = StringSearch.splitString(yytext(),"*COMP}", true, 6);			
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			}
 		}
 		
 {SubjVerbObjNom}  { 
-			StringSearch.splitString(yytext(),"VP]", false, 3);		
-			out.write(StringSearch.firstString+ObjNomOpen+StringSearch.nextString+ObjNomClose);
+	//System.err.println("obj2-5");
+			theIndex = StringSearch.splitString(yytext(),"VP]", false, 3);		
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+ObjNomOpen+StringSearch.nextString+ObjNomClose);
+			}
 		  } 
 {VerbSubjObjNom}  { 
+	//System.err.println("obj2-6");
 			theIndex = StringSearch.splitString(yytext(),"*SUBJ<}", true, 7);		
 			if (theIndex == -1)
 				theIndex = StringSearch.splitString(yytext(),"*SUBJ}", true, 6);	
-			out.write(StringSearch.firstString+ObjNomOpen+StringSearch.nextString+ObjNomClose);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+ObjNomOpen+StringSearch.nextString+ObjNomClose);
+			}
 		  } 
 
 {PPVPInfObj}	{ 
-			//System.err.print("FOUND " + yytext() + " FOUND ");
+	//System.err.println("obj2-7");
 			/* Find where the PP phrase ended and insert the OBJ label */
-			StringSearch.splitString(yytext(),"PP]", false, 3);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			theIndex = StringSearch.splitString(yytext(),"PP]", false, 3);		
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			}
 		} 
 
 {Function}	{out.write(yytext());}	/* Don't touch the phrases that have already been function marked */
 
 {NPPhrases}	{out.write(yytext());}	/* Don't touch NPs phrases */
-{Complement1}	{out.write(Comp0Open+yytext()+Comp0Close);} 
-{Complement2}	{out.write(Comp0Open+yytext()+Comp0Close);} 
+{Complement1}	{out.write(Comp0Open+yytext()+Comp0Close);
+	//System.err.println("1111 " + yytext());
+		} 
+{Complement2}	{out.write(Comp0Open+yytext()+Comp0Close);
+	//System.err.println("2222 " + yytext());
+		} 
 
 "\n"		{ //System.err.print("Reading line: " + Integer.toString(yyline+1) + "\r"); 
 		out.write("\n"); }

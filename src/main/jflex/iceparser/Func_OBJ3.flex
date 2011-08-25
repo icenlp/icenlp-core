@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2009 Hrafn Loftsson
  *
  * This file is part of the IceNLP toolkit.
@@ -32,7 +32,7 @@ import java.io.*;
 %class Func_OBJ3
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -85,7 +85,7 @@ PPPhrase = {OpenPP}~{ClosePP}
 	[NP eitt foheo vor nheo NP]
 */
 
-PronounTag = f[oa]{Gender}{Number}{Case}{WhiteSpace}+
+PronounTag = {encodeOpen}f[oa]{Gender}{Number}{Case}{encodeClose}{WhiteSpace}+
 NounNumeral = {NounTag}{WordSpaces}{NumeralTag}
 NumeralNoun = {NumeralTag}{WordSpaces}{NounTag}
 PronounNoun = {PronounTag}{WordSpaces}{NounTag}
@@ -113,14 +113,28 @@ ComplObjDat = {AdjCompl}{WhiteSpace}+{ObjDat}
 			theIndex = StringSearch.splitString(yytext(),"{*COMP<", true, -1);		
 			if (theIndex == -1)
 				theIndex = StringSearch.splitString(yytext(),"{*COMP", true, -1);			
-			out.write(ObjAP2Open+StringSearch.firstString+ObjAP2Close+StringSearch.nextString);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(ObjAP2Open+StringSearch.firstString+ObjAP2Close+StringSearch.nextString);
+			}
 		}
 {ComplObjDat}	{ 
 			/* Find where the Complement function ended and insert the OBJ label */
 			theIndex = StringSearch.splitString(yytext(),"*COMP<}", true, 7);		
 			if (theIndex == -1)
 				theIndex = StringSearch.splitString(yytext(),"*COMP}", true, 6);			
-			out.write(StringSearch.firstString+ObjAP1Open+StringSearch.nextString+ObjAP1Close);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+ObjAP1Open+StringSearch.nextString+ObjAP1Close);
+			}
 		}
 
 

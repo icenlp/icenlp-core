@@ -31,7 +31,7 @@ import java.io.*;
 %class Phrase_NPs
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -85,10 +85,12 @@ NPConjAcc = {CommaNPAcc}*{ConjPhrase}{WhiteSpace}+({NPAcc}|{APAcc})
 NPConjDat = {CommaNPDat}*{ConjPhrase}{WhiteSpace}+({NPDat}|{APDat})
 NPConjGen = {CommaNPGen}*{ConjPhrase}{WhiteSpace}+{NPGen}
 
+
 NPSeq = {NPProperNom}{WhiteSpace}+{NPNom}			|
 	{NPProperAcc}{WhiteSpace}+{NPAcc}			|
 	{NPProperDat}{WhiteSpace}+{NPDat}			|
 	{NPProperGen}{WhiteSpace}+{NPGen}			|
+
 	
 	{NPNomGenQual}{WhiteSpace}+({NPProperNom}|{NPConjNom}) 	| 
 	{NPAccGenQual}{WhiteSpace}+({NPProperAcc}|{NPConjAcc}) 	| 

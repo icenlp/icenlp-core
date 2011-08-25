@@ -29,7 +29,7 @@ import java.io.*;
 %class Func_OBJ
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -103,91 +103,183 @@ VerbSupineObj = {VPSupine}{WhiteSpace}+{Object}
 %%
 
 {SubjVerbObj}	{ 
-			StringSearch.splitString(yytext(),"VP]", false, 3);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+	//System.err.println("obj-1");
+			theIndex = StringSearch.splitString(yytext(),"VP]", false, 3);		
+
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+			{
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			}
 		} 		
 	
 {SubjVerbAdvPObj} { 
-			/* An AdvP might be part of the object itself! */
-			/* Is there an AdvP after the Verb? */
+	//System.err.println("obj-2");
+			//  An AdvP might be part of the object itself! 
+			//  Is there an AdvP after the Verb? 
 			theIndex = StringSearch.splitString2(yytext(), "VP]", "AdvP]");
 			if (theIndex == -1)
 			{
-				/* Find where the AdvP phrase ended and insert the OBJ label */
-				StringSearch.splitString(yytext(),"AdvP]", false, 5);		
+				// Find where the AdvP phrase ended and insert the OBJ label 
+				theIndex = StringSearch.splitString(yytext(),"AdvP]", false, 5);		
 			}
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 		
 		
-{SubjVerbPPObj} { 			
-			StringSearch.splitString(yytext(),"PP]", false, 3);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+{SubjVerbPPObj} { 		
+	//System.err.println("obj-3");	
+			theIndex = StringSearch.splitString(yytext(),"PP]", false, 3);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 		
 		
 {VerbSubjObj}	{ 
-			/* Find where the Subj phrase ended and insert the OBJ label */
-			StringSearch.splitString(yytext(),"*SUBJ<}", false, 7);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+	//System.err.println("obj-4");
+			// Find where the Subj phrase ended and insert the OBJ label 
+			//System.err.println(yytext());
+			theIndex = StringSearch.splitString(yytext(),"*SUBJ<}", false, 7);	
+			if (theIndex == -1)	
+				theIndex = StringSearch.splitString(yytext(),"*SUBJ}", false, 6);
+			if (theIndex != -1)
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			else
+				out.write(yytext());
 		} 
 {VerbSubjAdvPObj}	{ 
-			/* Is there an AdvP after the Subject? */
+	//System.err.println("obj-5");
+			// Is there an AdvP after the Subject? 
 			theIndex = StringSearch.splitString2(yytext(), "*SUBJ<}", "AdvP]");
 			if (theIndex == -1)
-				/* Find where the Subj phrase ended and insert the OBJ label */
-				StringSearch.splitString(yytext(),"*SUBJ<}", false, 7);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			{
+				// Find where the Subj phrase ended and insert the OBJ label 
+				theIndex = StringSearch.splitString(yytext(),"*SUBJ<}", false, 7);		
+			}
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 {VerbSubjPPObj}	{ 
-			StringSearch.splitString(yytext(),"PP]", false, 3);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+	//System.err.println("obj-6");
+			theIndex = StringSearch.splitString(yytext(),"PP]", false, 3);		
+
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 
 {ObjVerbSubj}	{ 
+	//System.err.println("obj-7");
 			/* Find where the Verb phrase started and insert the OBJ label */
-			StringSearch.splitString(yytext(),"[VP", false, -1);		
-			out.write(Obj2Open+StringSearch.firstString+Obj2Close+StringSearch.nextString);
+			theIndex = StringSearch.splitString(yytext(),"[VP", false, -1);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(Obj2Open+StringSearch.firstString+Obj2Close+StringSearch.nextString);
 		} 
 
 {VerbObj}	{ 
-			StringSearch.splitString(yytext(),"VP]", false, 3);		
+	//System.err.println("obj-8");
+	//System.err.println(yytext());
+			theIndex = StringSearch.splitString(yytext(),"VP]", false, 3);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
 			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 {VerbAdvPObj}	{ 
+	//System.err.println("obj-9");
 			/* An AdvP might be part of the object itself! */
 			/* Is there an AdvP after the Verb? */
 			theIndex = StringSearch.splitString2(yytext(), "VP]", "AdvP]");
 			if (theIndex == -1)
-				StringSearch.splitString(yytext(),"AdvP]", false, 5);		
-			
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+				theIndex = StringSearch.splitString(yytext(),"AdvP]", false, 5);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 {VerbPPObj}	{ 
-			StringSearch.splitString(yytext(),"PP]", false, 3);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+	//System.err.println("obj-10");
+			theIndex = StringSearch.splitString(yytext(),"PP]", false, 3);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 		
 {VerbInfObj}	{ 
+	//System.err.println("obj-11");
 			/* Find where the Verb Infinitive phrase ended and insert the OBJ label */
-			StringSearch.splitString(yytext(),"VPi]", false, 4);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			theIndex = StringSearch.splitString(yytext(),"VPi]", false, 4);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 {VerbInfAdvPObj}	{ 
-			/* Is there an AdvP after the Verb? */
+	//System.err.println("obj-12");
+	//System.err.println(yytext());
+
+			String afterVpi = yytext().substring(yytext().indexOf("VPi]")+4, yytext().length()); 
+			afterVpi = afterVpi.trim();
+
+			//Is there an AdvP after the Verb?
+			if(afterVpi.substring(0, 5).equals("[AdvP"))
+			{
+				theIndex = StringSearch.splitString(yytext(), " AdvP]", true, 6);
+			}
+			//Is there a PP after the Verb?
+			else if(afterVpi.substring(0, 3).equals("[PP"))
+			{
+				theIndex = StringSearch.splitString(yytext(), " PP]", true, 4);
+			}
+			else
+			{
+				theIndex = StringSearch.splitString(yytext(), "VPi]", false, 4);
+			}
+
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			}
+
+
+/*
+			// Is there an AdvP after the Verb? 
 			theIndex = StringSearch.splitString2(yytext(), "VPi]", "AdvP]");
 			if (theIndex == -1)
 			{
-				/* Is there a PP after the Verb? */
+				// Is there a PP after the Verb? 
 				theIndex = StringSearch.splitString2(yytext(), "VPi]", "PP]");
-				if (theIndex == -1)
-					/* Find where the Verb Infinitive phrase ended and insert the OBJ label */
-					StringSearch.splitString(yytext(),"VPi]", false, 4);		
+				if (theIndex == -1)// Find where the Verb Infinitive phrase ended and insert the OBJ label 
+					theIndex = StringSearch.splitString(yytext(),"VPi]", false, 4);		
 			}
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+*/
 		} 
 {VerbSupineObj}	{ 
+	//System.err.println("obj-13");
 			/* Find where the Verb Supine phrase ended and insert the OBJ label */
-			StringSearch.splitString(yytext(),"VPs]", false, 4);		
-			out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
+			theIndex = StringSearch.splitString(yytext(),"VPs]", false, 4);		
+			if(theIndex == -1)
+				out.write(yytext());
+			else
+				out.write(StringSearch.firstString+Obj1Open+StringSearch.nextString+Obj1Close);
 		} 
 		
 

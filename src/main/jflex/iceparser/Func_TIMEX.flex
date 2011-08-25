@@ -31,7 +31,7 @@ import java.io.*;
 %class Func_TIMEX
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{ 
@@ -75,7 +75,7 @@ PPPhrase = {OpenPP}~{ClosePP}
 	[NP nokkrum fokfþ dögum nkfþ NP] [AdvP síðar/seinna aam AdvP]
 */
 
-NumberTag = t[ao]{WhiteSpace}+
+NumberTag = {encodeOpen}t[ao]{encodeClose}{WhiteSpace}+
 NounNumeral = {WordSpaces}({NounTag}{WordSpaces}){NumberTag}
 AdjPhrase = {OpenAP}a?~{CloseAP}
 AdvPWords =  {OpenAdvP}{WhiteSpace}+s(íðar|einna){WhiteSpace}+{AdverbTag}{CloseAdvP}
@@ -99,9 +99,32 @@ TemporalDat = {TimeDat}{WhiteSpace}+{AdvPWords}
 
 {Temporal}	{out.write(TempOpen+yytext()+TempClose);}	
 
-{TemporalDat}	{	/* Find where the AdvP started and insert the Temporal label */
-			StringSearch.splitString(yytext(),"[AdvP", true, -1);
-			out.write(TempOpen+StringSearch.firstString+TempClose+StringSearch.nextString);
+{TemporalDat}	{	
+			// Find where the NPd ends and insert the temporal label to the AdvP after it
+
+		
+			theIndex = StringSearch.splitString(yytext()," NP]", false, 4);
+			if(theIndex == -1)
+			{	
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(TempOpen+StringSearch.firstString+TempClose+StringSearch.nextString);
+			}
+			
+/*
+			// Find where the AdvP started and insert the Temporal label 
+			theIndex = StringSearch.splitString(yytext(),"[AdvP", true, -1);
+			if(theIndex == -1)
+			{	
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(TempOpen+StringSearch.firstString+TempClose+StringSearch.nextString);
+			}
+*/
 		}
 
 "\n"		{ //System.err.print("Reading line: " + Integer.toString(yyline+1) + "\r"); 

@@ -21,6 +21,7 @@
  */
 package is.iclt.icenlp.core.tokenizer;
 
+import is.iclt.icenlp.core.utils.IceTag;
 import is.iclt.icenlp.core.utils.Tag;
 import is.iclt.icenlp.core.tokenizer.Token;
 
@@ -159,6 +160,17 @@ public class TokenTags extends Token
         if (!tagExists(t))
             tags.add(new Tag(t));
     }
+    
+    public void addTagWithLemma(String t, String lemma)
+    {
+    	if (!tagExists(t))
+    	{
+    		IceTag ta = new IceTag(t);
+    		ta.setLemma(lemma);
+    		
+    		tags.add(ta);
+    	}
+    }
 
     public void addTagFront(String t)
     {
@@ -212,6 +224,20 @@ public class TokenTags extends Token
         String[] tags = splitTags(tagStr);
            for (int i=0; i<tags.length; i++)
               addTag(tags[i]);
+    }
+    
+    public void addAllTagsWithLemma(String t, String lemma)
+    {
+        String tagStr;
+        // Add all possible tags; tags are separated by "_"
+        tagStr = t;
+
+        String[] tags = splitTags(tagStr);
+        
+        for (int i=0; i<tags.length; i++)
+        {
+        	addTagWithLemma(t, lemma);
+        }
     }
 
     public void addAllTagsWithSeparator(String t, String sep)
@@ -296,19 +322,52 @@ public class TokenTags extends Token
         String tagStr = "";
         int i=0;
         Iterator iterator = tags.iterator();
-        while (iterator.hasNext()) {
+        
+        while (iterator.hasNext())
+        {
             Tag element = (Tag)iterator.next();
-                if (i==0)
-                    tagStr = element.toString();
-                else
-                {
-                    tagStr = tagStr + sep + element.toString();
-                }
-                i++;
+            
+            if (i==0)
+            {
+                tagStr = element.toString();
+            }
+            else
+            {
+                tagStr = tagStr + sep + element.toString();
+            }
+            
+            i++;
         }
+        
         return tagStr;
     }
 
+    public String allLexicalUnits()
+    {
+        String tagStr = null;
+        int i=0;
+        Iterator iterator = tags.iterator();
+        
+        tagStr = lexeme + ":";
+        
+        while (iterator.hasNext())
+        {
+            Tag element = (Tag)iterator.next();
+            
+            if (i==0)
+            {
+                tagStr = tagStr + element.getLemma() + "(" + element.toString() + ")";
+            }
+            else
+            {
+                tagStr = tagStr + "_" + element.getLemma() + "(" + element.toString() + ")";
+            }
+            
+            i++;
+        }
+        
+        return tagStr;
+    }
 
     public String toString()
     {

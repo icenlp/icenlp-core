@@ -12,17 +12,24 @@ import is.iclt.icenlp.core.tokenizer.Token.TokenCode;
 
 public class Word 
 {
-    // Member variables.
+    // Private member variables.
     private String lexeme;
     private String tag;
     private String lemma;
+    public String parseString = null;
+    private boolean onlyOutputLexeme;
+    private boolean unknown = false;
+    
+    // Public member variables.
     public MWECode mweCode;
     public TokenCode tokenCode;
     public boolean linkedToPreviousWord;
-
+    public String posSpace;
+    public String preSpace;
+    public String invMWMark = null;
+    
     // Constructor for the class.
-    public Word(String lexeme, String tag, MWECode mweCode, TokenCode tokenCode, boolean linkedToPreviousWord)
-    {
+    public Word(String lexeme, String tag, MWECode mweCode, TokenCode tokenCode, boolean linkedToPreviousWord){
         this.lexeme = lexeme;
         this.tag = tag;
         this.mweCode = mweCode;
@@ -30,8 +37,7 @@ public class Word
         this.linkedToPreviousWord = linkedToPreviousWord;
     }
     
-    public Word(String lexeme, String lemma, String tag, MWECode mweCode, TokenCode tokenCode, boolean linkedToPreviousWord)
-    {
+    public Word(String lexeme, String lemma, String tag, MWECode mweCode, TokenCode tokenCode, boolean linkedToPreviousWord){
         this.lexeme = lexeme;
         this.tag = tag;
         this.mweCode = mweCode;
@@ -40,13 +46,22 @@ public class Word
         this.linkedToPreviousWord = linkedToPreviousWord;
     }
     
+    public Word(String lexeme, String lemma, String tag, MWECode mweCode, TokenCode tokenCode, boolean linkedToPreviousWord, boolean unknown){
+        this.lexeme = lexeme;
+        this.tag = tag;
+        this.mweCode = mweCode;
+        this.lemma = lemma;
+        this.tokenCode = tokenCode;
+        this.linkedToPreviousWord = linkedToPreviousWord;
+        this.unknown = unknown;
+    }
+    
     /**
      * Getter function for the lexeme member variable.
      * @return String object that contains the lexeme of
      * of the word.
      */
-    public String getLexeme()
-    {
+    public String getLexeme(){
         return lexeme;
     }
 
@@ -55,8 +70,7 @@ public class Word
      * @param lexeme String object that contains the
      * lexeme of the word.
      */
-    public void setLexeme(String lexeme)
-    {
+    public void setLexeme(String lexeme){
         this.lexeme = lexeme;
     }
 
@@ -64,8 +78,7 @@ public class Word
      * Getter function for the tag member variable.
      * @return String object that contains the tag.
      */
-    public String getTag()
-    {
+    public String getTag(){
         return tag;
     }
 
@@ -73,8 +86,7 @@ public class Word
      * Setter function for the tag member variable.
      * @param tag String object that contains the tag.
      */
-    public void setTag(String tag)
-    {
+    public void setTag(String tag){
         this.tag = tag;
     }
 
@@ -82,8 +94,7 @@ public class Word
      * Getter function for the lemma member variable.
      * @return String object that contains the lemma.
      */
-    public String getLemma()
-    {
+    public String getLemma(){
         return lemma;
     }
     
@@ -91,18 +102,41 @@ public class Word
      * Setter function for the lemma member variable.
      * @param lemma String object that contains the lemma.
      */
-    public void setLemma(String lemma)
-    {
+    public void setLemma(String lemma){
         this.lemma = lemma;
     }
-
+    
     /**
      * Setter function for the MWECode member
      * variable.
      * @return MWEcode.
      */
-    public MWECode getMWECode()
-    {
+    public MWECode getMWECode(){
         return this.mweCode;
     }
+
+	/**
+	 * Get function for onlyOutputLexeme member variable.
+	 * @return true/false value for onlyOutputLexeme.
+	 */
+    public boolean isOnlyOutputLexeme() {
+		return onlyOutputLexeme;
+	}
+
+    /**
+     * Get function for unknown member variable.
+     * @return true/false value for unknown
+     */
+    public boolean isUnknown() {
+    	return unknown;
+    }
+	
+	/**
+	 * Set function for onlyOutputLexeme member variable. When this value is set, then
+	 * the server only outputs the lexeme for this word (without any tagging, etc).
+	 * @param onlyOutputLexeme true/false value for onlyOutputLexeme.
+	 */
+	public void setOnlyOutputLexeme(boolean onlyOutputLexeme) {
+		this.onlyOutputLexeme = onlyOutputLexeme;
+	}
 }

@@ -33,16 +33,25 @@
 package is.iclt.icenlp.core.iceparser;
 import java.util.regex.*;
 import java.io.*;
+import is.iclt.icenlp.core.utils.IceParserUtils;
 %%
 
 %public
 %class Clean1
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
+
+
 %{
+  String encO =  IceParserUtils.encodeOpen;
+  String encC =  IceParserUtils.encodeClose;
+  
+  String rEncO =  IceParserUtils.regexEncodeOpen;
+  String rEncC =  IceParserUtils.regexEncodeClose;
+
   String nomStr = "n";
   String accStr = "a";
   String datStr = "d";
@@ -96,8 +105,8 @@ import java.io.*;
 %include src/main/jflex/iceparser/regularDef.txt
 %include src/main/jflex/iceparser/funcDef.txt
 
-ProperNounTagNotGen = n{Gender}{Number}[noþ]("-"|{ArticleChar}){ProperName}{WhiteSpace}+
-ProperNounTagGen = n{Gender}{Number}e("-"|{ArticleChar}){ProperName}{WhiteSpace}+
+ProperNounTagNotGen = {encodeOpen}n{Gender}{Number}[noþ]("-"|{ArticleChar}){ProperName}{encodeClose}{WhiteSpace}+
+ProperNounTagGen = {encodeOpen}n{Gender}{Number}e("-"|{ArticleChar}){ProperName}{encodeClose}{WhiteSpace}+
 ProperNounWithQualifer = {OpenNP}g{WordSpaces}{ProperNounTagNotGen}({WordSpaces}{ProperNounTagGen})+~{CloseNP}
 
 AdvPSeq = (({OpenAdvP}~{AdverbTag}{CloseAdvP}){WhiteSpace}+){2,5}
@@ -131,16 +140,22 @@ DatNPWithNomAdjPhrase = {OpenNP}d{WhiteSpace}+{OpenAP}n~{CloseNP}
 		
 {ProperNounWithQualifer}	{
 					String str = yytext();
+
 					// Search for the first nom/acc/dat proper noun tag 
-					Pattern p = Pattern.compile("n[kvh][ef][noþ](g|-)[msö]");
+					//Pattern p = Pattern.compile("\\^"+"n[kvh][ef][noþ](g|-)[msö]"+"\\$");
+					Pattern p = Pattern.compile(rEncO+"n[kvh][ef][noþ](g|-)[msö]"+rEncC);
+
 					Matcher m = p.matcher(str);
 					if (m.find())
 					{
+	
 						// Return the indexes of the start char matched and the last character matched, plus one.
 						int startIdx = m.start();
 						int endIdx = m.end();
 						String tag = str.substring(startIdx,endIdx);
-						//System.err.println("Tag: " + tag);
+						tag = tag.substring(encO.length(), tag.length()-encC.length());
+
+				//	System.err.println("Tag: " + tag);
 						String caseStr = analyseTag(tag);
 						String firstPart = str.substring(0,endIdx);
 						String secondPart = str.substring(endIdx);
@@ -149,6 +164,7 @@ DatNPWithNomAdjPhrase = {OpenNP}d{WhiteSpace}+{OpenAP}n~{CloseNP}
 						//System.err.println("First part: " + firstPart);
 						//System.err.println("Second  part: " + secondPart);
 						firstPart = firstPart.replaceFirst("\\[NPg",replacementStr);
+
 						out.write(firstPart + " NP]" + " [NPg " + secondPart);
 					}
 					//else

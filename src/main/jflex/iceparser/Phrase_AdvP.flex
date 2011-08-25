@@ -29,7 +29,7 @@ import java.io.*;
 %class Phrase_AdvP
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -65,14 +65,14 @@ import java.io.*;
 
 %include src/main/jflex/iceparser/regularDef.txt
 
-InterjectionTag = au{WhiteSpace}+
+InterjectionTag = {encodeOpen}au{encodeClose}{WhiteSpace}+
 Interjection = {WordSpaces}{InterjectionTag}
 
 AdverbPhrase = {Adverb}
 InterjectionPhrase = {Interjection} 
 
 MainConjWords = [oO]g|[eE](n(da)?|ða|llegar)|[hH]eldur|[nN]é
-MainConjTag = c{WhiteSpace}+
+MainConjTag = {encodeOpen}c{encodeClose}{WhiteSpace}+
 MainConj = {WhiteSpace}*{MainConjWords}{WhiteSpace}+{MainConjTag}
 MainConjPhrase = {MainConj} 
 SubConjPhrase = {Conj}

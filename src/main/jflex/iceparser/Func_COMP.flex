@@ -29,7 +29,7 @@ import java.io.*;
 %class Func_COMP
 %standalone
 %line
-
+%extends IceParserTransducer
 %unicode
 
 %{
@@ -93,7 +93,12 @@ SubjVerbAdvPCompl = {SubjectVerbBe}({MWE_AdvP}|{AdvP}){WhiteSpace}+{Complement}
 SubjVerbMWEAdvPCompl = {SubjectVerbBe}{MWE_AdvP}{WhiteSpace}+{AdvP}{WhiteSpace}+{Complement}
 SubjVerbCPCompl = {SubjectVerbBe}{CP}{WhiteSpace}+{Complement}
 SubjVerbNPCompl = {SubjectVerbBe}({AdvP}{WhiteSpace}+)?({NPAcc}|{NPDat}){WhiteSpace}+{Complement}  /* Það var mér tilhlökkunarefni */
+
+
 SubjVerbCompl = {SubjectVerbBe}({FuncQualifier}{WhiteSpace}+)?{Complement}
+//leyfa comp a undan lika, þarf að testa.
+//SubjVerbCompl = {SubjectVerbBe}(({FuncQualifier}{WhiteSpace}+)?{Complement}|{Complement}{WhiteSpace}+{FuncQualifier}?)
+
 
 //SubjVerbVerbPastCompl = {SubjectVerbBe}{VPPast}{WhiteSpace}+{Complement}	/* hún var orðin leið */
 //SubjVerbSpecialCompl = {FuncSubject}{WhiteSpace}+{VP}{WhiteSpace}+{Complement}	/* ég heiti Eva */
@@ -112,31 +117,113 @@ VerbPPCompl = {VPBe}{WhiteSpace}+{PP}{WhiteSpace}+{Complement}
 
 
 {SubjVerbAdvPCompl} 	{ 
-			/* Find where the Adverb phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"AdvP]", true, 5);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				//Find where the Verbe Be phrase ends and search for the possible complement tags from there.
+	//System.err.println("comp-1");
+	//System.err.println(yytext());
+
+
+				theIndex = yytext().indexOf("VPb]")+4;
+
+				String afterVPb = yytext().substring(theIndex, yytext().length());
+				String firstPart = "";
+				String secondPart = "";
+				
+				if(afterVPb.contains("[NP"))
+				{
+					firstPart = yytext().substring(0, theIndex + afterVPb.indexOf("[NP"));
+					secondPart = yytext().substring(theIndex + afterVPb.indexOf("[NP"), yytext().length());
+				}
+				else if(afterVPb.contains("[VP"))
+				{
+					firstPart = yytext().substring(0, theIndex + afterVPb.indexOf("[VP"));
+					secondPart = yytext().substring(theIndex + afterVPb.indexOf("[VP"), yytext().length());
+				}
+				else if(afterVPb.contains("[AP"))
+				{
+					firstPart = yytext().substring(0, theIndex + afterVPb.indexOf("[AP"));
+					secondPart = yytext().substring(theIndex + afterVPb.indexOf("[AP"), yytext().length());
+				}
+
+				
+				if(yytext().indexOf("VPb]") == -1)
+				{
+					out.write(yytext());
+				}
+				else
+				{
+					out.write(firstPart + Comp1Open + secondPart + Comp1Close);
+				}
+
+
+				// old.
+/*
+				// Find where the Adverb phrase ended and insert the COMP label 
+				theIndex = StringSearch.splitString(yytext(),"AdvP]", true, 5);	
+	
+				if(theIndex == -1)
+				{
+					out.write(yytext());
+				}
+				else
+				{
+					out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				}
+*/
 			} 
 {SubjVerbMWEAdvPCompl}  {
-			/* Find where the second adverb phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext()," AdvP]", true, 6);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				/* Find where the second adverb phrase ended and insert the COMP label */
+				theIndex = StringSearch.splitString(yytext()," AdvP]", true, 6);	
+	//System.err.println("comp-2");	
+				if(theIndex == -1)
+				{
+					out.write(yytext());
+				}
+				else
+				{
+					out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				}
 			} 
 
 {SubjVerbNPCompl}	{ 
-			/* Find where the NP phrase ended after the verb phrase and insert the COMP label */
-			StringSearch.splitString2(yytext(),"VPb]","NP]");		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				/* Find where the NP phrase ended after the verb phrase and insert the COMP label */
+				theIndex = StringSearch.splitString2(yytext(),"VPb]","NP]");	
+	//System.err.println("comp-3");	
+				if(theIndex == -1)
+				{
+					out.write(yytext());
+				}
+				else
+				{
+					out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				}
 			} 			
 
 {SubjVerbCPCompl}	{ 
-			/* Find where the CP phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"CP]", true, 3);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				/* Find where the CP phrase ended and insert the COMP label */
+				theIndex = StringSearch.splitString(yytext(),"CP]", true, 3);	
+	//System.err.println("comp-4");	
+				if(theIndex == -1)
+				{
+					out.write(yytext());
+				}
+				else
+				{
+					out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+				}
 			}			
 {SubjVerbCompl}	{ 
 			/* Find where the Verb phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"VPb]", false, 4);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			theIndex = StringSearch.splitString(yytext(),"VPb]", false, 4);	
+	//System.err.println("comp-5");
+	//System.err.println(yytext());	
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			}
 		} 
 /*
 {SubjVerbSpecialCompl}	{ 
@@ -145,7 +232,7 @@ VerbPPCompl = {VPBe}{WhiteSpace}+{PP}{WhiteSpace}+{Complement}
 			}
 
 {SubjVerbVerbPastCompl}	{ 
-			/* Find where the Verb phrase ended and insert the COMP label */
+			// Find where the Verb phrase ended and insert the COMP label
 			StringSearch.splitString(yytext(),"VPb]", false, 4);		
 			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
 		} 
@@ -153,48 +240,127 @@ VerbPPCompl = {VPBe}{WhiteSpace}+{PP}{WhiteSpace}+{Complement}
 {SubjCompl}	{ 
 			/* Find where the func subject phrase ended and insert the COMP label */
 			theIndex = StringSearch.splitString(yytext(),"*SUBJ}", false, 6);
+	//System.err.println("comp-6");
 			if (theIndex == -1) 
 			{
 				theIndex = StringSearch.splitString(yytext(),"*SUBJ<}", false, 7); 
 				if (theIndex == -1) 
 					theIndex = StringSearch.splitString(yytext(),"*SUBJ>}", false, 7); 
 			}
-			out.write(StringSearch.firstString+Comp0Open+StringSearch.nextString+Comp0Close);
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp0Open+StringSearch.nextString+Comp0Close);
+			}
 		} 
 {SubjPPCompl}	{ 
 			/* Find where the Preposition phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"PP]", false, 3);		
-			out.write(StringSearch.firstString+Comp0Open+StringSearch.nextString+Comp0Close);
+			theIndex = StringSearch.splitString(yytext(),"PP]", false, 3);	
+	//System.err.println("comp-7");	
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp0Open+StringSearch.nextString+Comp0Close);
+			}
 		} 		
 		
 {VerbSubjCompl}	{ 
 			/* Find where the Subj function ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"*SUBJ<}", false, 7);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			theIndex = StringSearch.splitString(yytext(),"*SUBJ<}", false, 7);
+	//System.err.println("comp-8");		
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			}
 		} 
 {VerbCompl}	{ 
 			/* Find where the Verb phrase ended and insert the COMP label */
-			theIndex = StringSearch.splitString(yytext(),"VPb]", false, 4);		
-			if (theIndex == -1) {theIndex = StringSearch.splitString(yytext(),"VPi]", false, 4);}
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			theIndex = StringSearch.splitString(yytext(),"VPb]", false, 4);	
+	//System.err.println("comp-9");	
+			if (theIndex == -1) 
+			{
+				theIndex = StringSearch.splitString(yytext(),"VPi]", false, 4);
+			}
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			}
 		} 
 {ComplVerb}	{ 
 			/* Find where the Verb phrase started and insert the COMP label */
-			StringSearch.splitString(yytext(),"[VPb", false, -1);		
-			out.write(Comp2Open+StringSearch.firstString+Comp2Close+StringSearch.nextString);
+			theIndex = StringSearch.splitString(yytext(),"[VPb", false, -1);
+	//System.err.println("comp-10");	
+	//System.err.println(yytext());		
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(Comp2Open+StringSearch.firstString+Comp2Close+StringSearch.nextString);
+	//System.err.println("First : \n" + StringSearch.firstString);
+	//System.err.println("Second : \n" + StringSearch.nextString);
+			}
 		} 
 {VerbAdvPCompl}	{ 
+
 			/* Find where the Adverbial phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"AdvP]", false, 5);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			theIndex = StringSearch.splitString(yytext(),"AdvP]", true, 5);/////////////////var upprunalega false/*/-/-/-/-/-/-/-/-///
+	//System.err.println("comp-11");
+	//System.err.println(yytext());		
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+	//System.err.println("First : \n" + StringSearch.firstString);
+	//System.err.println("Second : \n" + StringSearch.nextString);
+			}
 		} 
 		
 {VerbPPCompl}	{ 
 			/* Find where the Preposition phrase ended and insert the COMP label */
-			StringSearch.splitString(yytext(),"PP]", false, 3);		
-			out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			theIndex = StringSearch.splitString(yytext(),"PP]", false, 3);	
+	//System.err.println("comp-12");	
+			if(theIndex == -1)
+			{
+				out.write(yytext());
+			}
+			else
+			{
+				out.write(StringSearch.firstString+Comp1Open+StringSearch.nextString+Comp1Close);
+			}
 		} 
 		
 "\n"		{ //System.err.print("Reading line: " + Integer.toString(yyline+1) + "\r"); 
-			out.write("\n"); }
-.		{ out.write(yytext());}
+			out.write("\n");
+ 		}
+.		{ out.write(yytext());		
+		}
+
+
+
+
+
+
+
+
+
+
+
